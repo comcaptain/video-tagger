@@ -3,6 +3,27 @@
   "version": "0.1.0",
   "private": true,
   "main": "public/electron.js",
+  "homepage": "./",
+  "author": {
+    "name": "孙国强",
+    "email": "htmlcaptain@gmail.com",
+    "url": "https://github.com/comcaptain"
+  },
+  "build": {
+    "appId": "com.sgq.video-tagger",
+    "productName": "Video Tagger",
+    "copyright": "Copyright © 2019 ${author}",
+    "mac": {
+      "category": "public.app-category.utilities"
+    },
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
+  },
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -17,7 +38,10 @@
     "build": "rescripts build",
     "test": "rescripts test",
     "eject": "react-scripts eject",
-    "electron-dev": "concurrently \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\""
+    "electron-dev": "concurrently \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
+    "postinstall": "electron-builder install-app-deps",
+    "preelectron-pack": "yarn build",
+    "electron-pack": "electron-builder -w"
   },
   "eslintConfig": {
     "extends": "react-app"
