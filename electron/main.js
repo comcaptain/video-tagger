@@ -1,6 +1,4 @@
-const electron = require('electron');
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
+const { app, globalShortcut, BrowserWindow } = require('electron')
 
 const path = require('path');
 const isDev = require('electron-is-dev');
@@ -20,7 +18,10 @@ function createWindow() {
   mainWindow.on('closed', () => mainWindow = null);
 }
 
-app.on('ready', createWindow);
+app.on('ready', function() {
+  registerHotKeys();
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -33,3 +34,17 @@ app.on('activate', () => {
     createWindow();
   }
 });
+
+const TAKE_SCREENSHOT_HOTKEY = "Ctrl+Shift+Alt+E"
+function registerHotKeys() {
+  let registered = globalShortcut.register("Ctrl+Shift+Alt+E", takeScreenShotTriggered);
+  if (!registered) {
+    console.error("Failed to register hot key", TAKE_SCREENSHOT_HOTKEY);
+    return;
+  }
+  console.info("Registered hot key", TAKE_SCREENSHOT_HOTKEY);
+}
+
+function takeScreenShotTriggered() {
+  console.info("Take screenshot triggered")
+}
