@@ -15,9 +15,18 @@ export default class Tags extends React.Component {
 		})
 	}
 
+	removeTag(tagName) {
+		this.setState({
+			tags: this.state.tags.filter(v => v.name !== tagName)
+		})
+	}
+
 	render() {
 		let tagsDOM = this.state.tags.map(tag => (
-			<li key={tag.name} className="video-tag">{tag.name} <button className="remove-tag">x</button></li>
+			<li key={tag.name} className="video-tag">
+				{tag.name}
+				<button className="remove-tag" onClick={e => this.removeTag(tag.name)}>x</button>
+			</li>
 		))
 		return (
 			<div>
