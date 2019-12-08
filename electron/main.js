@@ -19,7 +19,7 @@ function createWindow() {
 }
 
 app.on('ready', function() {
-	new TakeScreenshotListener("Ctrl+Shift+Alt+E").startListening();
+	new TakeScreenshotListener("Ctrl+T").startListening();
 	createWindow();
 });
 
@@ -28,6 +28,11 @@ app.on('window-all-closed', () => {
 		app.quit();
 	}
 });
+
+app.on('will-quit', () => {
+	// Unregister all shortcuts.
+	globalShortcut.unregisterAll()
+})
 
 app.on('activate', () => {
 	if (mainWindow === null) {
