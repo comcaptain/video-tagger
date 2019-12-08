@@ -1,8 +1,9 @@
 const SCREENSHOT_DIRECTORY = 'F:/video-tagger-data/potplayer-screenshot';
-const { globalShortcut, clipboard } = require('electron')
+const { globalShortcut, clipboard, BrowserWindow } = require('electron')
 const fs = require('fs')
 const robot = require("robotjs");
 const VideoScreenshot = require("./VideoScreenshot.js");
+const ReactWindow = require('./ReactWindow.js');
 
 module.exports = class TakeScreenshotListener {
 	constructor(hotKey) {
@@ -26,7 +27,7 @@ module.exports = class TakeScreenshotListener {
 		robot.keyTap("c", ["control", "shift", "alt"]);
 		let videoFilePath = clipboard.readText();
 		let screenshot = new VideoScreenshot(SCREENSHOT_DIRECTORY, screenshotFileName, videoFilePath);
-		console.info(screenshot);
+		new ReactWindow(screenshot.toURL()).open();
 	}
 
 	watchForNewScreenshot() {

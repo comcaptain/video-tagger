@@ -1,20 +1,11 @@
-const { app, BrowserWindow } = require('electron')
+const { app } = require('electron')
 const TakeScreenshotListener = require("./TakeScreenshotListener.js")
-const path = require('path');
-const isDev = require('electron-is-dev');
+const ReactWindow = require('./ReactWindow.js');
 
 let mainWindow;
 
 function createWindow() {
-	mainWindow = new BrowserWindow({width: 900, height: 680, webPreferences: {
-		nodeIntegration: true
-	}});
-	mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
-	if (isDev) {
-		// Open the DevTools.
-		//BrowserWindow.addDevToolsExtension('<location to your react chrome extension>');
-		mainWindow.webContents.openDevTools();
-	}
+	mainWindow = new ReactWindow("/index.html").open();
 	mainWindow.on('closed', () => mainWindow = null);
 }
 
