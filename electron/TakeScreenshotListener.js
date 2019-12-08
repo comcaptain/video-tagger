@@ -21,8 +21,8 @@ module.exports = class TakeScreenshotListener {
 
 	async onTakeScreenshot() {
 		console.info("Take screenshot triggered")
-		// 500 delay is necessary, otherwise ctrl e would not work
-		setTimeout(() => robot.keyTap("e", "control"), 500);
+		// 250 delay is necessary, otherwise ctrl e would not work
+		setTimeout(() => robot.keyTap("e", "control"), 250);
 		let screenshotFileName = await this.watchForNewScreenshot();
 		robot.keyTap("c", ["control", "shift", "alt"]);
 		let videoFilePath = clipboard.readText();

@@ -1,5 +1,6 @@
 const SCRENSHOTS_DIR = "F:/video-tagger-data/screenshots"
 const MongoClient = require('mongodb').MongoClient;
+const assert = require("assert");
 const fs = require("fs");
 const path = require('path');
 const util = require('util');
@@ -9,7 +10,7 @@ const FingerprintCalculator = require("./FingerprintCalculator.js");
 
 module.exports = class DataPersister {
 	constructor() {
-		let client = new MongoClient("mongodb://localhost:27017");
+		let client = new MongoClient("mongodb://localhost:27017", {useUnifiedTopology: true});
 		this._dbPromise = new Promise((resolve, reject) => {
 			client.connect(err => {
 				assert.equal(null, err);
@@ -22,11 +23,11 @@ module.exports = class DataPersister {
 	async persist(screenshot, tagNames) {
 		let [tagIDs, videoScreenshot] = await Promise.all([this.loadOrSaveTags(tagNames), this.persistVideoScreenshot(screenshot)]);
 		this._dbPromise.then(db => {
-			let tagPoints = tagIDs.map(tagID => {
+			let tagPoints = tagIDs.map(tagID => ({
 				tag_id: tagID,
 				video_id: videoScreenshot.video_id,
 				screenshot_id: videoScreenshot._id
-			});
+			}));
 			console.log(`Inserting ${tagPoints.length} new TagPoint records: ${tagPoints}`)
 			return db.collection("TagPoint").insertMany(tagPoints).then(docs => {
 				console.log(`Inserted ${docs.length} new TagPoint records`)
@@ -48,10 +49,10 @@ module.exports = class DataPersister {
 				let tagID = tagNameToIDMap[tagName];
 				if (tagID) tagIDs.push(tagID);
 				return !tagID;
-			}).map(tagName => {
+			}).map(tagName => ({
 				name: tagName,
 				create_time: createTime
-			});
+			}));
 			console.log(`Inserting ${newTags.length} new Tag records: ${newTags}`)
 			return db.collection("Tag").insertMany(newTags).then(savedNewTags => {
 				console.log(`Inserted ${savedNewTags.length} new Tag records`);

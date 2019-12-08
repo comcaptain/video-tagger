@@ -1,6 +1,8 @@
 const { app } = require('electron')
 const TakeScreenshotListener = require("./TakeScreenshotListener.js")
 const ReactWindow = require('./ReactWindow.js');
+const DataPersister = require('./DataPersister.js');
+const SaveNewScreenshotListener = require('./SaveNewScreenshotListener.js');
 
 let mainWindow;
 
@@ -11,6 +13,8 @@ function createWindow() {
 
 app.on('ready', function() {
 	new TakeScreenshotListener("Ctrl+T").startListening();
+	let persiter = new DataPersister();
+	new SaveNewScreenshotListener(persiter).startListening();
 	createWindow();
 });
 
