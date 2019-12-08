@@ -11,7 +11,7 @@ export default class Tags extends React.Component {
 
 	render() {
 		let tagsDOM = this.state.tags.map(tag => (
-			<li key={tag.name} class="video-tag">{tag.name} <button className="remove-tag">x</button></li>
+			<li key={tag.name} className="video-tag">{tag.name} <button className="remove-tag">x</button></li>
 		))
 		return (
 			<div>

@@ -6,7 +6,8 @@ export default class AddNewTag extends React.Component {
 		super(props);
 		this.state = {
 			visible: true,
-			tags: props.allTags.slice()
+			tags: props.allTags.slice(),
+			selectedIndex: null
 		}
 	}
 
@@ -24,10 +25,14 @@ export default class AddNewTag extends React.Component {
 			this.setState({tags: []})
 			return;
 		}
-		this.setState({tags: this.props.allTags.filter(tag => tag.name.toLowerCase().includes(value))})
+		this.setState({
+			tags: this.props.allTags.filter(tag => tag.name.toLowerCase().includes(value)),
+			selectedIndex: null
+		})
 	}
 
 	onGlobalKeyDown(event) {
+		let selectedIndex = this.state.selectedIndex;
 		if (event.key == 't') {
 			event.preventDefault();
 			this.onTrigger();
@@ -35,6 +40,35 @@ export default class AddNewTag extends React.Component {
 		else if (event.key == 'Escape') {
 			this.onDismiss();
 		}
+		else if (event.key == 'ArrowUp') {
+			event.preventDefault();
+			let nextIndex;
+			if (selectedIndex === 0) {
+				nextIndex = 0;
+			}
+			else if (selectedIndex == null) {
+				nextIndex = this.state.tags.length - 1;
+			}
+			else {
+				nextIndex = selectedIndex - 1;
+			}
+			this.setState({selectedIndex: nextIndex})
+		}
+		else if (event.key == 'ArrowDown') {
+			event.preventDefault();
+			let nextIndex;
+			if (selectedIndex === this.state.tags.length - 1) {
+				nextIndex = selectedIndex;
+			}
+			else if (selectedIndex === null) {
+				nextIndex = 0;
+			}
+			else {
+				nextIndex = selectedIndex + 1;
+			}
+			this.setState({selectedIndex: nextIndex})
+		}
+
 	}
 
 	componentDidMount() {
@@ -48,15 +82,26 @@ export default class AddNewTag extends React.Component {
 
 	render() {
 		if (!this.state.visible) return null;
-		let tagDOMs = this.state.tags.map(tag => {
+		let tagDOMs = this.state.tags.map((tag, index) => {
 			return (
-				<li key={tag.name}>{tag.name}</li>
+				<li 
+					key={tag.name} 
+					className={index === this.state.selectedIndex ? "selected" : null}
+					>
+					{tag.name}
+				</li>
 			)
 		})
 		let tagsDOM = tagDOMs.length > 0 ? <ul>{tagDOMs}</ul> : null;
 		return (
-			<div class="add-new-tag">
-				<input type="text" autoFocus={true} class={tagsDOM ? "has-hint" : null} onInput={e => this.onInput(e)}/>
+			<div className="add-new-tag">
+				<input 
+					type="text" 
+					autoFocus={true} 
+					className={tagsDOM ? "has-hint" : null} 
+					onInput={e => this.onInput(e)}
+					value={this.state.selectedIndex === null ? null : this.state.tags[this.state.selectedIndex].name}
+					/>
 				{tagsDOM}
 			</div>
 		)

@@ -18,6 +18,8 @@
 	border-radius: 5px;
 	padding: 0 10px;
 	outline: none;
+	font-family: consolas;
+	font-size: 17px;
 }
 
 .add-new-tag input.has-hint {
@@ -34,8 +36,16 @@
 	border: 1px solid gray;
 	border-top: none;
 	display: block;
-	width: 100%;
+	width: calc(100% + 20px);
 	list-style: none;
 	line-height: 26px;
-	padding: 7px 10px;
+	padding: 7px 0;
+}
+
+.add-new-tag li {
+	padding: 0 10px;
+}
+
+.add-new-tag li.selected {
+	background: #cecece;
 }
