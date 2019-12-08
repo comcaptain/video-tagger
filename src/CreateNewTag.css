@@ -1,0 +1,29 @@
+#create-new-tag {
+	width: calc(100% - 150px);
+	font-family: consolas;
+	margin: 0 auto;
+}
+
+#meta-data {
+	margin-top: 5px;
+	margin-bottom: 2px;
+	color: #4ea058;
+}
+
+#meta-data::after {
+	content: " ";
+	display: block;
+	clear: both;
+}
+
+#video-file-path {
+	float: left;
+}
+
+#seek-position {
+	float: right;
+}
+
+#video-screenshot {
+	width: 100%;
+}
