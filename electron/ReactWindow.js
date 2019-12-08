@@ -24,6 +24,9 @@ module.exports = class ReactWindow {
 			reactWindow.maximize();
 		}
 		reactWindow.loadURL(isDev ? 'http://localhost:3000' + this._url : `file://${path.join(__dirname, '../build/' + this._url)}`);
+		if (this._options.openDEVTool) {
+			reactWindow.webContents.openDevTools()
+		}
 		return reactWindow;
 	}
 }

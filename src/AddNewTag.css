@@ -1,0 +1,41 @@
+.add-new-tag {
+	position: fixed;
+    top: calc(50% - 200px);
+    left: calc(50% - 250px);
+    width: 500px;
+}
+
+.add-new-tag input[type=text] {
+	width: 100%;
+	display: block;
+	border: none;
+	height: 30px;
+	border-radius: 5px;
+	width: 100%;
+	display: block;
+	border: 1px solid gray;
+	height: 30px;
+	border-radius: 5px;
+	padding: 0 10px;
+	outline: none;
+}
+
+.add-new-tag input.has-hint {
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+.add-new-tag ul {
+	background: white;
+	margin-top: 0;
+	border-radius: 5px;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+	border: 1px solid gray;
+	border-top: none;
+	display: block;
+	width: 100%;
+	list-style: none;
+	line-height: 26px;
+	padding: 7px 10px;
+}
