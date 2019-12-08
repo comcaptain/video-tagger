@@ -5,7 +5,7 @@ const fsRead = util.promisify(fs.read);
 const fsStat = util.promisify(fs.stat);
 const SAMPLE_BYTES_COUNT = 10;
 
-class FingerprintCalculator {
+module.exports = class FingerprintCalculator {
 	constructor(filePath) {
 		this._filePath = filePath;
 	}
@@ -27,5 +27,3 @@ class FingerprintCalculator {
 		})
 	}
 }
-
-new FingerprintCalculator("V:/mirror/未分类/MIAD-889-C/MIAD-889-C.mp4").calculate().then(fingerprint => console.info(fingerprint));
