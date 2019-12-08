@@ -5,9 +5,10 @@ export default class AddNewTag extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			visible: true,
-			tags: props.allTags.slice(),
-			selectedIndex: null
+			visible: false,
+			tags: this.getDefaultTags(),
+			selectedIndex: null,
+			value: ""
 		}
 	}
 
@@ -19,20 +20,30 @@ export default class AddNewTag extends React.Component {
 		this.setState({visible: false})
 	}
 
-	onInput(event) {
-		let value = event.target.value.toLowerCase();
+	getDefaultTags() {
+		return this.props.allTags.slice(0, 10);
+	}
+
+	onChange(event) {
+		let value = event.target.value;
+		let tags;
 		if (value.trim() === "") {
-			this.setState({tags: []})
-			return;
+			tags = this.getDefaultTags();
+		}
+		else {
+			let keyword = value.toLowerCase();
+			tags = this.props.allTags.filter(tag => tag.name.toLowerCase().includes(keyword));
 		}
 		this.setState({
-			tags: this.props.allTags.filter(tag => tag.name.toLowerCase().includes(value)),
-			selectedIndex: null
+			tags: tags,
+			selectedIndex: null,
+			value: value
 		})
 	}
 
 	onGlobalKeyDown(event) {
 		let selectedIndex = this.state.selectedIndex;
+		let nextIndex;
 		if (event.key == 't') {
 			event.preventDefault();
 			this.onTrigger();
@@ -42,7 +53,6 @@ export default class AddNewTag extends React.Component {
 		}
 		else if (event.key == 'ArrowUp') {
 			event.preventDefault();
-			let nextIndex;
 			if (selectedIndex === 0) {
 				nextIndex = 0;
 			}
@@ -52,11 +62,9 @@ export default class AddNewTag extends React.Component {
 			else {
 				nextIndex = selectedIndex - 1;
 			}
-			this.setState({selectedIndex: nextIndex})
 		}
 		else if (event.key == 'ArrowDown') {
 			event.preventDefault();
-			let nextIndex;
 			if (selectedIndex === this.state.tags.length - 1) {
 				nextIndex = selectedIndex;
 			}
@@ -66,7 +74,12 @@ export default class AddNewTag extends React.Component {
 			else {
 				nextIndex = selectedIndex + 1;
 			}
-			this.setState({selectedIndex: nextIndex})
+		}
+		if (nextIndex !== undefined) {
+			this.setState({
+				selectedIndex: nextIndex,
+				value: this.state.tags[nextIndex].name
+			})
 		}
 
 	}
@@ -99,8 +112,8 @@ export default class AddNewTag extends React.Component {
 					type="text" 
 					autoFocus={true} 
 					className={tagsDOM ? "has-hint" : null} 
-					onInput={e => this.onInput(e)}
-					value={this.state.selectedIndex === null ? null : this.state.tags[this.state.selectedIndex].name}
+					onChange={e => this.onChange(e)}
+					value={this.state.value}
 					/>
 				{tagsDOM}
 			</div>
