@@ -4,7 +4,11 @@ import './AddNewTag.css';
 export default class AddNewTag extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {
+		this.state = this.getInitialState();
+	}
+
+	getInitialState() {
+		return {
 			visible: false,
 			tags: this.getDefaultTags(),
 			selectedIndex: null,
@@ -17,7 +21,7 @@ export default class AddNewTag extends React.Component {
 	}
 
 	onDismiss() {
-		this.setState({visible: false})
+		this.setState(this.getInitialState())
 	}
 
 	getDefaultTags() {
@@ -74,6 +78,11 @@ export default class AddNewTag extends React.Component {
 			else {
 				nextIndex = selectedIndex + 1;
 			}
+		}
+		else if (event.key == 'Enter') {
+			event.preventDefault();
+			this.props.onAddNewTag(this.state.value);
+			this.onDismiss();
 		}
 		if (nextIndex !== undefined) {
 			this.setState({
