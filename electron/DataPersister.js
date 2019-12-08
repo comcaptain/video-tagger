@@ -28,8 +28,9 @@ module.exports = class DataPersister {
 				video_id: videoScreenshot.video_id,
 				screenshot_id: videoScreenshot._id
 			}));
-			console.log(`Inserting ${tagPoints.length} new TagPoint records: ${tagPoints}`)
-			return db.collection("TagPoint").insertMany(tagPoints).then(docs => {
+			console.log(`Inserting ${tagPoints.length} new TagPoint records:`, tagPoints)
+			return db.collection("TagPoint").insertMany(tagPoints).then(o => {
+				let docs = o.ops;
 				console.log(`Inserted ${docs.length} new TagPoint records`)
 			})
 		})
@@ -37,7 +38,7 @@ module.exports = class DataPersister {
 
 	async loadOrSaveTags(tagNames) {
 		let db = await this._dbPromise;
-		this.loadAllTags().then(savedTags => {
+		return this.loadAllTags().then(savedTags => {
 			let tagNameToIDMap = {};
 			for (let savedTag of savedTags) {
 				if (tagNameToIDMap[savedTag.name]) throw "Duplicate tag found " + savedTag.name;
@@ -53,16 +54,18 @@ module.exports = class DataPersister {
 				name: tagName,
 				create_time: createTime
 			}));
-			console.log(`Inserting ${newTags.length} new Tag records: ${newTags}`)
-			return db.collection("Tag").insertMany(newTags).then(savedNewTags => {
+			if (newTags.length === 0) return tagIDs;
+			console.log(`Inserting ${newTags.length} new Tag records:`, newTags)
+			return db.collection("Tag").insertMany(newTags).then(o => {
+				let savedNewTags = o.ops;
 				console.log(`Inserted ${savedNewTags.length} new Tag records`);
-				return tagIDs.append(savedNewTags.map(v => v._id));
+				return tagIDs.concat(savedNewTags.map(v => v._id));
 			})
 		});
 	}
 
 	loadAllTags() {
-		this._dbPromise.then(db => {
+		return this._dbPromise.then(db => {
 			console.log("Loading all tags")
 			return db.collection("Tag").find({}).project({name: 1}).toArray();
 		}).then(tags => {
@@ -75,7 +78,7 @@ module.exports = class DataPersister {
 		let filePath = screenshot.screenshotFilePath;
 		let newFilePath = SCRENSHOTS_DIR + "/" + path.basename(filePath, ".jpg") + new Date().getTime() + ".jpg";
 		let db = await this._dbPromise;
-		fsRename(filePath, newFilePath).then(() => {
+		return fsRename(filePath, newFilePath).then(() => {
 			console.log(`Moved screenshot file from ${filePath} to ${newFilePath}`);
 			return this.loadOrSaveVideo(screenshot.videoFilePath)
 		}).then(video => {
@@ -84,8 +87,9 @@ module.exports = class DataPersister {
 				screenshot_path: newFilePath,
 				seek_position: screenshot.seekPosition
 			}
-			console.log(`Inserting VideoScreenshot ${videoScreenshot}`);
-			return db.collection("VideoScreenshot").insertOne().then(v => {
+			console.log("Inserting VideoScreenshot", videoScreenshot);
+			return db.collection("VideoScreenshot").insertOne(videoScreenshot).then(o => {
+				let v = o.ops[0];
 				console.log("Inserted new VideoScreenshot record", v);
 				return v;
 			})
@@ -97,7 +101,7 @@ module.exports = class DataPersister {
 			let videoCollection = db.collection("Video");
 			let condition = {path: videoPath, last_modified_time: stats.mtime};
 			console.log("Finding Video by condition", condition)
-			videoCollection.findOne(condition).then(video => {
+			return videoCollection.findOne(condition).then(video => {
 				if (video) {
 					console.log("Found video", video)
 					return video;
@@ -110,7 +114,7 @@ module.exports = class DataPersister {
 
 	insertVideo(videoCollection, videoPath, mtime) {
 		console.log("Calculating fingerprint for", videoPath)
-		new FingerprintCalculator(videoPath).calculate().then(fingerprint => {
+		return new FingerprintCalculator(videoPath).calculate().then(fingerprint => {
 			let record = {
 				name: path.basename(videoPath),
 				path: videoPath,
@@ -118,7 +122,8 @@ module.exports = class DataPersister {
 				fingerprint: fingerprint
 			}
 			console.log("Calculated, inserting new Video record", record)
-			return videoCollection.insertOne(record).then(v => {
+			return videoCollection.insertOne(record).then(o => {
+				let v = o.ops[0];
 				console.log("Inserted new Video record", v);
 				return v;
 			})
