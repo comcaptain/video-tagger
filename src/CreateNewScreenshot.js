@@ -1,5 +1,5 @@
 import React from 'react';
-import './CreateNewTag.css';
+import './CreateNewScreenshot.css';
 
 export default class CreateNewTag extends React.Component {
 	constructor(props) {

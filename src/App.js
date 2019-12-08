@@ -7,14 +7,14 @@ import {
 	useRouteMatch,
 	useParams
 } from "react-router-dom";
-import CreateNewTag from './CreateNewTag';
+import CreateNewScreenshot from './CreateNewScreenshot';
 
 export default function App() {
 	return (
 		<Router>
 			<Switch>
 				<Route path="/tag/create">
-					<CreateNewTag />
+					<CreateNewScreenshot />
 				</Route>
 				<Route path="/">
 					<Home />
