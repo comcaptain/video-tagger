@@ -9,7 +9,7 @@ export default class Tags extends React.Component {
 		}
 	}
 
-	onAddNewTag(newTagName) {
+	handleAddNewTag(newTagName) {
 		this.setState({
 			tags: this.state.tags.concat([{name: newTagName}])
 		})
@@ -31,7 +31,7 @@ export default class Tags extends React.Component {
 		return (
 			<div>
 				<ul id="video-tags">{tagsDOM}</ul>
-				<AddNewTag allTags={this.props.allTags} onAddNewTag={this.onAddNewTag.bind(this)} />
+				<AddNewTag allTags={this.props.allTags} handleAddNewTag={this.handleAddNewTag.bind(this)} />
 			</div>
 		)
 	}

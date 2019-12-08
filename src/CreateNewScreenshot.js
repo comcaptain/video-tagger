@@ -1,6 +1,7 @@
 import React from 'react';
 import Tags from './Tags';
 import './CreateNewScreenshot.css';
+const { ipcRenderer } = require('electron')
 
 export default class CreateNewTag extends React.Component {
 	constructor(props) {
@@ -32,6 +33,32 @@ export default class CreateNewTag extends React.Component {
 				{name: "哈萨克斯坦"},
 			]
 		}
+	}
+
+	handleSave() {
+		ipcRenderer.send("save-new-screenshot", {
+			seekPosition: this.state.seekPosition,
+			videoFilePath: this.state.videoFilePath,
+			screenshotFilePath: this.state.screenshotFilePath
+		}, this.state.tags.map(v => v.name))
+	}
+
+	handleGlobalKeyDown(event) {
+		let selectedIndex = this.state.selectedIndex;
+		let nextIndex;
+		if (event.key === 's' && event.ctrlKey) {
+			event.preventDefault();
+			this.handleSave();
+		}
+	}
+
+	componentDidMount() {
+		this._listener = this.handleGlobalKeyDown.bind(this);
+		document.addEventListener("keydown", this._listener);
+	}
+
+	componentWillUnmount() {
+		document.removeEventListener("keydown", this._listener);
 	}
 
 	render() {

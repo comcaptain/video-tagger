@@ -16,11 +16,11 @@ export default class AddNewTag extends React.Component {
 		}
 	}
 
-	onTrigger() {
+	show() {
 		this.setState({visible: true})
 	}
 
-	onDismiss() {
+	dismiss() {
 		this.setState(this.getInitialState())
 	}
 
@@ -28,7 +28,7 @@ export default class AddNewTag extends React.Component {
 		return this.props.allTags.slice(0, 10);
 	}
 
-	onChange(event) {
+	handleChange(event) {
 		let value = event.target.value;
 		let tags;
 		if (value.trim() === "") {
@@ -45,15 +45,15 @@ export default class AddNewTag extends React.Component {
 		})
 	}
 
-	onGlobalKeyDown(event) {
+	handleGlobalKeyDown(event) {
 		let selectedIndex = this.state.selectedIndex;
 		let nextIndex;
 		if (event.key == 't') {
 			event.preventDefault();
-			this.onTrigger();
+			this.show();
 		}
 		else if (event.key == 'Escape') {
-			this.onDismiss();
+			this.dismiss();
 		}
 		else if (event.key == 'ArrowUp') {
 			event.preventDefault();
@@ -81,8 +81,8 @@ export default class AddNewTag extends React.Component {
 		}
 		else if (event.key == 'Enter') {
 			event.preventDefault();
-			this.props.onAddNewTag(this.state.value);
-			this.onDismiss();
+			this.props.handleAddNewTag(this.state.value);
+			this.dismiss();
 		}
 		if (nextIndex !== undefined) {
 			this.setState({
@@ -94,7 +94,7 @@ export default class AddNewTag extends React.Component {
 	}
 
 	componentDidMount() {
-		this._listener = this.onGlobalKeyDown.bind(this);
+		this._listener = this.handleGlobalKeyDown.bind(this);
 		document.addEventListener("keydown", this._listener);
 	}
 
@@ -121,7 +121,7 @@ export default class AddNewTag extends React.Component {
 					type="text" 
 					autoFocus={true} 
 					className={tagsDOM ? "has-hint" : null} 
-					onChange={e => this.onChange(e)}
+					onChange={e => this.handleChange(e)}
 					value={this.state.value}
 					/>
 				{tagsDOM}
