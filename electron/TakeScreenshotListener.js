@@ -1,6 +1,8 @@
-const { globalShortcut } = require('electron')
+const SCREENSHOT_DIRECTORY = 'F:/video-tagger-data/potplayer-screenshot';
+const { globalShortcut, clipboard } = require('electron')
 const fs = require('fs')
 const robot = require("robotjs");
+const VideoScreenshot = require("./VideoScreenshot.js");
 
 module.exports = class TakeScreenshotListener {
 	constructor(hotKey) {
@@ -20,18 +22,20 @@ module.exports = class TakeScreenshotListener {
 		console.info("Take screenshot triggered")
 		// 250 delay is necessary, otherwise ctrl e would not work
 		setTimeout(() => robot.keyTap("e", "control"), 500);
-		let screenshotName = await this.watchForNewScreenshot();
-		console.info(screenshotName);
+		let screenshotFileName = await this.watchForNewScreenshot();
+		robot.keyTap("c", ["control", "shift", "alt"]);
+		let videoFilePath = clipboard.readText();
+		let screenshot = new VideoScreenshot(SCREENSHOT_DIRECTORY, screenshotFileName, videoFilePath);
+		console.info(screenshot);
 	}
 
 	watchForNewScreenshot() {
 		return new Promise((resolve, reject) => {
-			let watcher = fs.watch('F:/video-tagger-data/potplayer-screenshot', (eventType, filename) => {
+			let watcher = fs.watch(SCREENSHOT_DIRECTORY, (eventType, filename) => {
 				if (!filename) return;
 				watcher.close();
 				resolve(resolve(filename))
 			});
 		});
-
 	}
 }
