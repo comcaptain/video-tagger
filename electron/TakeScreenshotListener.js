@@ -21,13 +21,13 @@ module.exports = class TakeScreenshotListener {
 
 	async onTakeScreenshot() {
 		console.info("Take screenshot triggered")
-		// 250 delay is necessary, otherwise ctrl e would not work
+		// 500 delay is necessary, otherwise ctrl e would not work
 		setTimeout(() => robot.keyTap("e", "control"), 500);
 		let screenshotFileName = await this.watchForNewScreenshot();
 		robot.keyTap("c", ["control", "shift", "alt"]);
 		let videoFilePath = clipboard.readText();
 		let screenshot = new VideoScreenshot(SCREENSHOT_DIRECTORY, screenshotFileName, videoFilePath);
-		new ReactWindow(screenshot.toURL()).open();
+		new ReactWindow(screenshot.toURL(), {noMenuBar: true, maximize: true}).open();
 	}
 
 	watchForNewScreenshot() {

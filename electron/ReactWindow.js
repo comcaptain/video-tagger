@@ -17,12 +17,13 @@ module.exports = class ReactWindow {
 
 	open() {
 		let reactWindow = new BrowserWindow(this._options);
-		reactWindow.loadURL(isDev ? 'http://localhost:3000' + this._url : `file://${path.join(__dirname, '../build/' + this._url)}`);
-		if (isDev) {
-			// Open the DevTools.
-			//BrowserWindow.addDevToolsExtension('<location to your react chrome extension>');
-			reactWindow.webContents.openDevTools();
+		if (this._options.noMenuBar) {
+			reactWindow.removeMenu();
 		}
+		if (this._options.maximize) {
+			reactWindow.maximize();
+		}
+		reactWindow.loadURL(isDev ? 'http://localhost:3000' + this._url : `file://${path.join(__dirname, '../build/' + this._url)}`);
 		return reactWindow;
 	}
 }
