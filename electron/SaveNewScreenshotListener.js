@@ -9,8 +9,7 @@ module.exports = class SaveNewScreenshotListener {
 		ipcMain.on("save-new-screenshot", (event, screenshot, tagNames) => {
 			console.log("Save new screenshot request received", screenshot, tagNames);
 			this._persister.persist(screenshot, tagNames).then(() => {
-				console.log("Saved, notifying browser");
-				event.reply("save-new-screenshot", "done");
+				console.log("Saved");
 			})
 		})
 	}

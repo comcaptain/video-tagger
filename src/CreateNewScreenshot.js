@@ -19,15 +19,12 @@ export default class CreateNewScreenshot extends React.Component {
 	}
 
 	handleSave() {
-		ipcRenderer.on('save-new-screenshot', (event, arg) => {
-			console.info("saved, close window")
-			remote.getCurrentWindow().close();
-		})
 		ipcRenderer.send("save-new-screenshot", {
 			seekPosition: this.state.seekPosition,
 			videoFilePath: this.state.videoFilePath,
 			screenshotFilePath: this.state.screenshotFilePath
 		}, this.state.tags.map(v => v.name));
+		remote.getCurrentWindow().close();
 	}
 
 	handleAddNewTag(newTagName) {
