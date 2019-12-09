@@ -1,7 +1,7 @@
 import React from 'react';
 import Tags from './Tags';
 import './CreateNewScreenshot.css';
-const { ipcRenderer } = require('electron')
+const { ipcRenderer, remote } = require('electron')
 const dataLoader = require('./store/dataLoader.js')
 
 export default class CreateNewScreenshot extends React.Component {
@@ -19,11 +19,15 @@ export default class CreateNewScreenshot extends React.Component {
 	}
 
 	handleSave() {
+		ipcRenderer.on('save-new-screenshot', (event, arg) => {
+			console.info("saved, close window")
+			remote.getCurrentWindow().close();
+		})
 		ipcRenderer.send("save-new-screenshot", {
 			seekPosition: this.state.seekPosition,
 			videoFilePath: this.state.videoFilePath,
 			screenshotFilePath: this.state.screenshotFilePath
-		}, this.state.tags.map(v => v.name))
+		}, this.state.tags.map(v => v.name));
 	}
 
 	handleAddNewTag(newTagName) {
