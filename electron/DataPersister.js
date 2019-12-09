@@ -1,6 +1,5 @@
 const SCRENSHOTS_DIR = "F:/video-tagger-data/screenshots"
 const MongoClient = require('mongodb').MongoClient;
-const assert = require("assert");
 const fs = require("fs");
 const path = require('path');
 const util = require('util');
@@ -10,14 +9,7 @@ const FingerprintCalculator = require("./FingerprintCalculator.js");
 
 module.exports = class DataPersister {
 	constructor() {
-		let client = new MongoClient("mongodb://localhost:27017", {useUnifiedTopology: true});
-		this._dbPromise = new Promise((resolve, reject) => {
-			client.connect(err => {
-				assert.equal(null, err);
-				console.log("Connected successfully to Mongo DB");
-				resolve(client.db("video-tagger"));
-			});
-		});
+		this._dbPromise = new MongoClient("mongodb://localhost:27017", {useUnifiedTopology: true}).connect().then(client => client.db("video-tagger"));
 	}
 
 	async persist(screenshot, tagNames) {
