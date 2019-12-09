@@ -8,8 +8,10 @@ import {
 	useParams
 } from "react-router-dom";
 import CreateNewScreenshot from './CreateNewScreenshot';
+const dataLoader = require("./store/dataLoader.js");
 
 export default function App() {
+	dataLoader.loadAllVideos().then(videos => console.log(videos))
 	return (
 		<Router>
 			<Switch>
