@@ -15,7 +15,7 @@ export default class CreateNewScreenshot extends React.Component {
 			allTags: [],
 			tags: []
 		}
-		dataLoader.loadAllTags().then(allTags => this.setState({allTags: allTags}))
+		dataLoader.execute("loadAllTags").then(allTags => this.setState({allTags: allTags}))
 	}
 
 	handleSave() {

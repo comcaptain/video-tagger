@@ -1,83 +1,13 @@
-const MongoClient = require('mongodb').MongoClient;
+const { ipcRenderer } = require('electron')
 
-class DataPersister {
-	constructor() {
-		this._dbPromise = new MongoClient("mongodb://localhost:27017", {useUnifiedTopology: true}).connect().then(client => client.db("video-tagger"));
-	}
-
-	loadAllTags() {
-		return this._dbPromise.then(db => {
-			console.log("Loading all tags")
-			return db.collection("Tag").find({}).project({name: 1}).toArray();
-		}).then(tags => {
-			console.log(`Loaded ${tags.length} tags`);
-			return tags;
+module.exports.execute = function(functionName, parameters = []) {
+	return new Promise((resolve, reject) => {
+		console.log("Start loading...", functionName, parameters)
+		ipcRenderer.once('loaded', (event, result) => {
+			console.log("Received load result", result);
+			resolve(result);
 		})
-	}
-
-	async loadAllVideos() {
-		console.log("Load all videoes started")
-		let allScreenshots = await this.loadAllScreenshots();
-		let videoIDToScreenshots = {};
-		allScreenshots.forEach(screenshot => {
-			let videoID = screenshot.video_id;
-			if (!videoIDToScreenshots[videoID]) {
-				videoIDToScreenshots[videoID] = [];
-			}
-			delete screenshot.video_id;
-			videoIDToScreenshots[videoID].push(screenshot);
-		})
-		return this._dbPromise.then(db => {
-			console.log("Loading videos");
-			return db.collection("Video").find({}).project({path: 1}).toArray();
-		}).then(videos => {
-			console.log(`Loaded ${videos.length} videos`);
-			return videos.map(v => ({
-				path: v.path,
-				screenshots: videoIDToScreenshots[v._id],
-			}));
-		})
-	}
-
-	async loadAllScreenshots() {
-		let allTagPoints = await this.loadAllTagPoints();
-		let screenshotIDToTagNames = {};
-		allTagPoints.forEach(tagPoint => {
-			let screenshotID = tagPoint.screenshot_id;
-			if (!screenshotIDToTagNames[screenshotID]) {
-				screenshotIDToTagNames[screenshotID] = [];
-			}
-			screenshotIDToTagNames[screenshotID].push(tagPoint.tag_name);
-		})
-		return this._dbPromise.then(db => {
-			console.log("Loading screenshots");
-			return db.collection("VideoScreenshot").find({}).toArray();
-		}).then(screenshots => {
-			console.log(`Loaded ${screenshots.length} screenshots`);
-			return screenshots.map(v => ({
-				tag_names: screenshotIDToTagNames[v._id],
-				seek_position: v.seek_position,
-				screenshot_path: v.screenshot_path,
-				video_id: v.video_id
-			}));
-		})
-	}
-
-	async loadAllTagPoints() {
-		let allTags = await this.loadAllTags();
-		let tagIDToName = {};
-		allTags.forEach(tag => tagIDToName[tag._id] = tag.name);
-		return this._dbPromise.then(db => {
-			console.log("Loading TagPoints");
-			return db.collection("TagPoint").find({}).project({tag_id: 1, screenshot_id: 1}).toArray();
-		}).then(tagPoints => {
-			console.log(`Loaded ${tagPoints.length} tagPoints`);
-			return tagPoints.map(tagPoint => ({
-				tag_name: tagIDToName[tagPoint.tag_id],
-				screenshot_id: tagPoint.screenshot_id
-			}))
-		})
-	}
+		ipcRenderer.send('load', functionName, parameters);
+		console.log("Load request sent", functionName, parameters)
+	})
 }
-
-module.exports = new DataPersister();

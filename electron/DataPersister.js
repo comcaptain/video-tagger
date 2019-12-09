@@ -7,7 +7,7 @@ const fsRename = util.promisify(fs.rename);
 const fsStat = util.promisify(fs.stat);
 const FingerprintCalculator = require("./FingerprintCalculator.js");
 
-module.exports = class DataPersister {
+class DataPersister {
 	constructor() {
 		this._dbPromise = new MongoClient("mongodb://localhost:27017", {useUnifiedTopology: true}).connect().then(client => client.db("video-tagger"));
 	}
@@ -123,3 +123,5 @@ module.exports = class DataPersister {
 		})
 	}
 }
+
+module.exports = new DataPersister();
