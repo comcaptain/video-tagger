@@ -37,6 +37,7 @@ module.exports = class DataPersister {
 	}
 
 	async loadOrSaveTags(tagNames) {
+		console.info("Load or save tags", tagNames);
 		let db = await this._dbPromise;
 		return this.loadAllTags().then(savedTags => {
 			let tagNameToIDMap = {};

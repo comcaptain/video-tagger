@@ -2,8 +2,9 @@ import React from 'react';
 import Tags from './Tags';
 import './CreateNewScreenshot.css';
 const { ipcRenderer } = require('electron')
+const dataLoader = require('./store/dataLoader.js')
 
-export default class CreateNewTag extends React.Component {
+export default class CreateNewScreenshot extends React.Component {
 	constructor(props) {
 		super(props);
 		let parameters = new URL(window.location.href).searchParams;
@@ -11,28 +12,10 @@ export default class CreateNewTag extends React.Component {
 			videoFilePath: parameters.get("videoFilePath"),
 			screenshotFilePath: parameters.get("screenshotFilePath"),
 			seekPosition: parameters.get("seekPosition"),
-			allTags: [{_id: "dfawe1", name: "中国"},
-				{_id: "dfawe2", name: "日本"},
-				{_id: "dfawe3", name: "韩国"},
-				{_id: "dfawe4", name: "马来西亚"},
-				{_id: "dfawe5", name: "美国"},
-				{_id: "dfawe6", name: "新加坡"},
-				{_id: "dfawe7", name: "泰国"},
-				{_id: "dfawe8", name: "俄罗斯"},
-				{_id: "dfawe9", name: "法国"},
-				{_id: "dfawe10", name: "英国"},
-				{_id: "dfawe11", name: "新西兰"}
-			],
-			tags: [
-				{_id: "dfawe2", name: "日本"},
-				{_id: "dfawe3", name: "韩国"},
-				{_id: "dfawe4", name: "马来西亚"},
-				{_id: "dfawe5", name: "美国"},
-				{_id: "dfawe6", name: "新加坡"},
-				{name: "拉脱维亚"},
-				{name: "哈萨克斯坦"},
-			]
+			allTags: [],
+			tags: []
 		}
+		dataLoader.loadAllTags().then(allTags => this.setState({allTags: allTags}))
 	}
 
 	handleSave() {
@@ -41,6 +24,18 @@ export default class CreateNewTag extends React.Component {
 			videoFilePath: this.state.videoFilePath,
 			screenshotFilePath: this.state.screenshotFilePath
 		}, this.state.tags.map(v => v.name))
+	}
+
+	handleAddNewTag(newTagName) {
+		this.setState({
+			tags: this.state.tags.concat([{name: newTagName}])
+		})
+	}
+
+	handleRemoveTag(tagName) {
+		this.setState({
+			tags: this.state.tags.filter(v => v.name !== tagName)
+		})
 	}
 
 	handleGlobalKeyDown(event) {
@@ -64,7 +59,12 @@ export default class CreateNewTag extends React.Component {
 	render() {
 		return (
 			<div id="create-new-tag">
-				<Tags allTags={this.state.allTags} tags={this.state.tags} />
+				<Tags 
+					allTags={this.state.allTags} 
+					tags={this.state.tags}
+					handleAddNewTag={this.handleAddNewTag.bind(this)}
+					handleRemoveTag={this.handleRemoveTag.bind(this)}
+				/>
 				<div id="meta-data">
 					<span id="video-file-path">{this.state.videoFilePath}</span>
 					<span id="seek-position">{this.state.seekPosition}</span>

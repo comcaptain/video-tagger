@@ -1,3 +1,4 @@
+// CHCP 65001
 const { app } = require('electron')
 const TakeScreenshotListener = require("./TakeScreenshotListener.js")
 const ReactWindow = require('./ReactWindow.js');
