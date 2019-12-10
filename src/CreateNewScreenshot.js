@@ -1,5 +1,5 @@
 import React from 'react';
-import Tags from './Tags';
+import Tags from './tag/Tags';
 import './CreateNewScreenshot.css';
 const { ipcRenderer, remote } = require('electron')
 const dataLoader = require('./store/dataLoader.js')
