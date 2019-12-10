@@ -10,7 +10,7 @@ export default class AddNewTag extends React.Component {
 	getInitialState() {
 		return {
 			visible: false,
-			tags: this.getDefaultTags(),
+			tagNames: this.getDefaultTags(),
 			selectedIndex: null,
 			value: ""
 		}
@@ -25,21 +25,21 @@ export default class AddNewTag extends React.Component {
 	}
 
 	getDefaultTags() {
-		return this.props.allTags.slice(0, 10);
+		return this.props.allTagNames.slice(0, 10);
 	}
 
 	handleChange(event) {
 		let value = event.target.value;
-		let tags;
+		let tagNames;
 		if (value.trim() === "") {
-			tags = this.getDefaultTags();
+			tagNames = this.getDefaultTags();
 		}
 		else {
 			let keyword = value.toLowerCase();
-			tags = this.props.allTags.filter(tag => tag.name.toLowerCase().includes(keyword));
+			tagNames = this.props.allTagNames.filter(tagName => tagName.toLowerCase().includes(keyword));
 		}
 		this.setState({
-			tags: tags,
+			tagNames: tagNames,
 			selectedIndex: null,
 			value: value
 		})
@@ -61,7 +61,7 @@ export default class AddNewTag extends React.Component {
 				nextIndex = 0;
 			}
 			else if (selectedIndex == null) {
-				nextIndex = this.state.tags.length - 1;
+				nextIndex = this.state.tagNames.length - 1;
 			}
 			else {
 				nextIndex = selectedIndex - 1;
@@ -69,7 +69,7 @@ export default class AddNewTag extends React.Component {
 		}
 		else if (event.key == 'ArrowDown') {
 			event.preventDefault();
-			if (selectedIndex === this.state.tags.length - 1) {
+			if (selectedIndex === this.state.tagNames.length - 1) {
 				nextIndex = selectedIndex;
 			}
 			else if (selectedIndex === null) {
@@ -87,7 +87,7 @@ export default class AddNewTag extends React.Component {
 		if (nextIndex !== undefined) {
 			this.setState({
 				selectedIndex: nextIndex,
-				value: this.state.tags[nextIndex].name
+				value: this.state.tagNames[nextIndex]
 			})
 		}
 
@@ -104,13 +104,13 @@ export default class AddNewTag extends React.Component {
 
 	render() {
 		if (!this.state.visible) return null;
-		let tagDOMs = this.state.tags.map((tag, index) => {
+		let tagDOMs = this.state.tagNames.map((tagName, index) => {
 			return (
 				<li 
-					key={tag.name} 
+					key={tagName} 
 					className={index === this.state.selectedIndex ? "selected" : null}
 					>
-					{tag.name}
+					{tagName}
 				</li>
 			)
 		})

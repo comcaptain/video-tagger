@@ -7,20 +7,22 @@ export default class Tags extends React.Component {
 	}
 
 	render() {
-		let tagsDOM = this.props.tags.map(tag => (
-			<li key={tag.name} className="video-tag">
-				{tag.name}
-				<button 
+		let tagsDOM = this.props.tagNames.map(tagName => (
+			<li key={tagName} className="video-tag">
+				{tagName}
+				{this.props.handleRemoveTag && (<button 
 					className="remove-tag" 
-					onClick={e => this.props.handleRemoveTag(tag.name)}>x</button>
+					onClick={e => this.props.handleRemoveTag(tagName)}>x</button>)
+				}
 			</li>
 		))
 		return (
 			<div>
 				<ul id="video-tags">{tagsDOM}</ul>
-				<AddNewTag 
-					allTags={this.props.allTags} 
-					handleAddNewTag={this.props.handleAddNewTag} />
+				{this.props.handleAddNewTag && (<AddNewTag 
+					allTagNames={this.props.allTagNames} 
+					handleAddNewTag={this.props.handleAddNewTag} />)
+				}
 			</div>
 		)
 	}

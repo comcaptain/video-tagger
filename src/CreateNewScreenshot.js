@@ -12,10 +12,10 @@ export default class CreateNewScreenshot extends React.Component {
 			videoFilePath: parameters.get("videoFilePath"),
 			screenshotFilePath: parameters.get("screenshotFilePath"),
 			seekPosition: parameters.get("seekPosition"),
-			allTags: [],
-			tags: []
+			allTagNames: [],
+			tagNames: []
 		}
-		dataLoader.execute("loadAllTags").then(allTags => this.setState({allTags: allTags}))
+		dataLoader.execute("loadAllTags").then(allTags => this.setState({allTagNames: allTags.map(v => v.name)}))
 	}
 
 	handleSave() {
@@ -23,19 +23,19 @@ export default class CreateNewScreenshot extends React.Component {
 			seekPosition: this.state.seekPosition,
 			videoFilePath: this.state.videoFilePath,
 			screenshotFilePath: this.state.screenshotFilePath
-		}, this.state.tags.map(v => v.name));
+		}, this.state.tagNames);
 		remote.getCurrentWindow().close();
 	}
 
 	handleAddNewTag(newTagName) {
 		this.setState({
-			tags: this.state.tags.concat([{name: newTagName}])
+			tagNames: this.state.tagNames.concat([newTagName])
 		})
 	}
 
 	handleRemoveTag(tagName) {
 		this.setState({
-			tags: this.state.tags.filter(v => v.name !== tagName)
+			tagNames: this.state.tagNames.filter(v => v !== tagName)
 		})
 	}
 
@@ -61,8 +61,8 @@ export default class CreateNewScreenshot extends React.Component {
 		return (
 			<div id="create-new-tag">
 				<Tags 
-					allTags={this.state.allTags} 
-					tags={this.state.tags}
+					allTagNames={this.state.allTagNames} 
+					tagNames={this.state.tagNames}
 					handleAddNewTag={this.handleAddNewTag.bind(this)}
 					handleRemoveTag={this.handleRemoveTag.bind(this)}
 				/>
@@ -72,7 +72,7 @@ export default class CreateNewScreenshot extends React.Component {
 				</div>
 				<img 
 					id="video-screenshot"
-					src={"file:///" + this.state.screenshotFilePath} 
+					src={"file:///" + this.state.screenshotFilePath}
 					alt={this.state.screenshotFilePath}/>
 			</div>
 		)
