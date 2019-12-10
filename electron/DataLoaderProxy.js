@@ -7,12 +7,11 @@ module.exports = class DataLoaderProxy {
 
 	start() {
 		console.log("Starting data loader proxy")
-		ipcMain.on("load", (event, functionName, parameters) => {
+		ipcMain.handle("load", async (event, functionName, parameters) => {
 			console.log("Load request received, loading...", functionName, parameters)
-			this.dataLoader[functionName].apply(this.dataLoader, parameters).then(result => {
-				console.log("loaded, replying")
-				event.reply("loaded", result);
-			})
+			const result = await this.dataLoader[functionName].apply(this.dataLoader, parameters);
+			console.log("loaded, replying");
+			return result;
 		})
 		console.log("Started data loader proxy")
 	}
