@@ -16,9 +16,9 @@
 [{
     "path": "xxx",
     "screenshots": [{
-        "seek_position": "xxxxx",
-        "screenshot_path": "xxxx",
-        "tag_names": ["aaa", "bbb", "ccc"]
+        "seekPosition": "xxxxx",
+        "screenshotPath": "xxxx",
+        "tagNames": ["aaa", "bbb", "ccc"]
     }]
 }]
 ```

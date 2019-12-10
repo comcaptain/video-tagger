@@ -8,10 +8,9 @@ import {
 	useParams
 } from "react-router-dom";
 import CreateNewScreenshot from './CreateNewScreenshot';
-const dataLoader = require('./store/dataLoader.js')
+import VideoList from './VideoList'
 
 export default function App() {
-	dataLoader.execute('loadAllVideos').then(v => console.log("Loaded", v));
 	return (
 		<Router>
 			<Switch>
@@ -19,13 +18,9 @@ export default function App() {
 					<CreateNewScreenshot />
 				</Route>
 				<Route path="/">
-					<Home />
+					<VideoList />
 				</Route>
 			</Switch>
 		</Router>
 	);
-}
-
-function Home() {
-	return <h2>Home</h2>;
 }

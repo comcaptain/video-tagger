@@ -55,9 +55,9 @@ class DataPersister {
 		}).then(screenshots => {
 			console.log(`Loaded ${screenshots.length} screenshots`);
 			return screenshots.map(v => ({
-				tag_names: screenshotIDToTagNames[v._id],
-				seek_position: v.seek_position,
-				screenshot_path: v.screenshot_path,
+				tagNames: screenshotIDToTagNames[v._id],
+				seekPosition: v.seek_position,
+				screenshotPath: v.screenshot_path,
 				video_id: v.video_id
 			}));
 		})
