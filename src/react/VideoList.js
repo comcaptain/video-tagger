@@ -1,13 +1,13 @@
 import React from 'react';
 import Video from './video/Video'
 import './VideoList.css';
-const dataLoader = require('./store/dataLoader.js')
+const IPCInvoker = require('./ipc/IPCInvoker.js');
 
 export default class VideoList extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {videos: []};
-		dataLoader.execute('loadAllVideos').then(v => this.setState({videos: v}));
+		new IPCInvoker("dataLoader").invoke("loadAllVideos").then(v => this.setState({videos: v}));
 	}
 
 	render() {

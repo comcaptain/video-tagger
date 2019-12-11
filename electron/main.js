@@ -4,8 +4,7 @@ const TakeScreenshotListener = require("./TakeScreenshotListener.js")
 const ReactWindow = require('./ReactWindow.js');
 const dataPersister = require('./dataPersister.js');
 const dataLoader = require('./dataLoader.js')
-const DataLoaderProxy = require('./DataLoaderProxy.js')
-const SaveNewScreenshotListener = require('./SaveNewScreenshotListener.js');
+const IPCInvokerServer = require('./IPCInvokerServer.js')
 
 let mainWindow;
 
@@ -16,8 +15,8 @@ function createWindow() {
 
 app.on('ready', function() {
 	new TakeScreenshotListener("Ctrl+Alt+T").startListening();
-	new SaveNewScreenshotListener(dataPersister).startListening();
-	new DataLoaderProxy(dataLoader).start();
+	new IPCInvokerServer(dataLoader, "dataLoader").start();
+	new IPCInvokerServer(dataPersister, "dataPersister").start();
 	createWindow();
 });
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import Tags from './tag/Tags';
 import './CreateNewScreenshot.css';
-const { ipcRenderer, remote } = require('electron')
-const dataLoader = require('./store/dataLoader.js')
+const { remote } = require('electron');
+const IPCInvoker = require('./ipc/IPCInvoker.js');
 
 export default class CreateNewScreenshot extends React.Component {
 	constructor(props) {
@@ -15,11 +15,11 @@ export default class CreateNewScreenshot extends React.Component {
 			allTagNames: [],
 			tagNames: []
 		}
-		dataLoader.execute("loadAllTags").then(allTags => this.setState({allTagNames: allTags.map(v => v.name)}))
+		new IPCInvoker("dataLoader").invoke("loadAllTags").then(allTags => this.setState({allTagNames: allTags.map(v => v.name)}));
 	}
 
 	handleSave() {
-		ipcRenderer.send("save-new-screenshot", {
+		new IPCInvoker("dataPersister").invoke("persist", {
 			seekPosition: this.state.seekPosition,
 			videoFilePath: this.state.videoFilePath,
 			screenshotFilePath: this.state.screenshotFilePath
