@@ -3,7 +3,7 @@ import AddNewTag from './AddNewTag';
 import './Tags.css';
 export default function(props) {
 	let tagsDOM = props.tagNames.map(tagName => (
-		<li key={tagName} className="video-tag">
+		<li key={tagName} className={"video-tag" + (props.handleRemoveTag ? " removable" : "")}>
 			{tagName}
 			{props.handleRemoveTag && (<button 
 				className="remove-tag" 
