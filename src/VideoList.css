@@ -1,0 +1,4 @@
+#video-list {
+	width: calc(100% - 100px);
+	margin: 0 auto;
+}

@@ -1,6 +1,7 @@
 import React from 'react';
 import Thumnail from './Thumnail'
 import Tags from '../tag/Tags'
+import './Video.css'
 
 export default function Video(props) {
 	let tagNames = new Set();
@@ -9,9 +10,11 @@ export default function Video(props) {
 	let thumnailDOMs = props.screenshots.map(v => <Thumnail {...v} key={v.screenshotPath} />);
 	return (
 		<div className="video">
-			<span className="path">{props.path}</span>
-			<Tags tagNames={tagNames} />
-			{thumnailDOMs}
+			<div className="video-meta-data">				
+				<Tags tagNames={tagNames} />
+				<span className="path">{props.path}</span>
+			</div>
+			<div className="thumnails">{thumnailDOMs}</div>
 		</div>
 	)
 }

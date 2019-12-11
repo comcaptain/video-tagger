@@ -12,8 +12,8 @@ export default function(props) {
 		</li>
 	))
 	return (
-		<div>
-			<ul id="video-tags">{tagsDOM}</ul>
+		<div className="video-tags">
+			<ul>{tagsDOM}</ul>
 			{props.handleAddNewTag && (<AddNewTag 
 				allTagNames={props.allTagNames} 
 				handleAddNewTag={props.handleAddNewTag} />)

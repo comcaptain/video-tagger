@@ -1,5 +1,6 @@
 import React from 'react';
 import Video from './video/Video'
+import './VideoList.css';
 const dataLoader = require('./store/dataLoader.js')
 
 export default class VideoList extends React.Component {
