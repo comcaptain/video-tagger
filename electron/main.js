@@ -15,7 +15,7 @@ function createWindow() {
 }
 
 app.on('ready', function() {
-	new TakeScreenshotListener("Ctrl+Shift+T").startListening();
+	new TakeScreenshotListener("Ctrl+Alt+T").startListening();
 	new SaveNewScreenshotListener(dataPersister).startListening();
 	new DataLoaderProxy(dataLoader).start();
 	createWindow();
