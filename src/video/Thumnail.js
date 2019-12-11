@@ -5,7 +5,7 @@ export default function Thumnail(props) {
 		<div className="thumnail">
 			<span className="seek-position">{props.seekPosition}</span>
 			<Tags tagNames={props.tagNames} />
-			<img src={props.screenshotPath}/>
+			<img src={props.screenshotPath} alt={props.screenshotPath}/>
 		</div>
 	)
 }

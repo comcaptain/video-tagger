@@ -48,26 +48,26 @@ export default class AddNewTag extends React.Component {
 	handleGlobalKeyDown(event) {
 		let selectedIndex = this.state.selectedIndex;
 		let nextIndex;
-		if (event.key == 't') {
+		if (event.key === 't') {
 			event.preventDefault();
 			this.show();
 		}
-		else if (event.key == 'Escape') {
+		else if (event.key === 'Escape') {
 			this.dismiss();
 		}
-		else if (event.key == 'ArrowUp') {
+		else if (event.key === 'ArrowUp') {
 			event.preventDefault();
 			if (selectedIndex === 0) {
 				nextIndex = 0;
 			}
-			else if (selectedIndex == null) {
+			else if (selectedIndex === null) {
 				nextIndex = this.state.tagNames.length - 1;
 			}
 			else {
 				nextIndex = selectedIndex - 1;
 			}
 		}
-		else if (event.key == 'ArrowDown') {
+		else if (event.key === 'ArrowDown') {
 			event.preventDefault();
 			if (selectedIndex === this.state.tagNames.length - 1) {
 				nextIndex = selectedIndex;
@@ -79,7 +79,7 @@ export default class AddNewTag extends React.Component {
 				nextIndex = selectedIndex + 1;
 			}
 		}
-		else if (event.key == 'Enter') {
+		else if (event.key === 'Enter') {
 			event.preventDefault();
 			this.props.handleAddNewTag(this.state.value);
 			this.dismiss();

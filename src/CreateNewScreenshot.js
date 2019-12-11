@@ -40,8 +40,6 @@ export default class CreateNewScreenshot extends React.Component {
 	}
 
 	handleGlobalKeyDown(event) {
-		let selectedIndex = this.state.selectedIndex;
-		let nextIndex;
 		if (event.key === 's' && event.ctrlKey) {
 			event.preventDefault();
 			this.handleSave();
