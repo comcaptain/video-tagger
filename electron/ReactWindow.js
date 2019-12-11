@@ -8,6 +8,7 @@ module.exports = class ReactWindow {
 		this._options = Object.assign({}, {
 			width: 900, 
 			height: 680,
+			show: false,
 			webPreferences: {
 				// Disable it in dev so that local file systems can be visited
 				webSecurity: !isDev,
@@ -27,6 +28,9 @@ module.exports = class ReactWindow {
 		if (this._options.openDEVTool) {
 			reactWindow.webContents.openDevTools()
 		}
+		reactWindow.once('ready-to-show', () => {
+			reactWindow.show()
+		})
 		return reactWindow;
 	}
 }

@@ -10,7 +10,7 @@ const SaveNewScreenshotListener = require('./SaveNewScreenshotListener.js');
 let mainWindow;
 
 function createWindow() {
-	mainWindow = new ReactWindow("/index.html").open();
+	mainWindow = new ReactWindow("/index.html", {maximize: true}).open();
 	mainWindow.on('closed', () => mainWindow = null);
 }
 

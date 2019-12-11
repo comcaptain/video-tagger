@@ -5,7 +5,7 @@ const path = require('path');
 const util = require('util');
 const fsRename = util.promisify(fs.rename);
 const fsStat = util.promisify(fs.stat);
-const FingerprintCalculator = require("./FingerprintCalculator.js");
+const FingerprintCalculator = require("../src/share/FingerprintCalculator.js");
 
 class DataPersister {
 	constructor() {
