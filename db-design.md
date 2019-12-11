@@ -19,7 +19,6 @@
 
 ### Video collection
 - uuid
-- name
 - path
 - `last_modified_time`
 - fingerprint

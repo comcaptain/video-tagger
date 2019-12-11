@@ -105,11 +105,14 @@ class DataPersister {
 		}))
 	}
 
+	updateVideoPath(videoID, newVideoPath) {
+		return _dbPromise.then(db => db.updateOne({_id: videoID}, {$set: {path: newVideoPath}}))
+	}
+
 	insertVideo(videoCollection, videoPath, mtime) {
 		console.log("Calculating fingerprint for", videoPath)
 		return new FingerprintCalculator(videoPath).calculate().then(fingerprint => {
 			let record = {
-				name: path.basename(videoPath),
 				path: videoPath,
 				last_modified_time: mtime,
 				fingerprint: fingerprint

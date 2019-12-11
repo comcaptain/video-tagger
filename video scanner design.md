@@ -11,17 +11,28 @@ Assume that if a file's absolute path & last update time is not changed, then th
    - If it's not video file, then do nothing
    - Find by path, if there is a corresponding Video record and last update time matches, then do nothing
    - Else find by fingerprint, if there is a corresponding Video record, then update path, name & last update time
-   - Else index the video
+   - ~~Else index the video~~ There is no need to do this because file
 3. If a Video record is not mapped to any file, then display it on the screen and add GUI feature to:
    -  Open Video record's detail screen
    -  Remove single Video record
    -  Remove all Video records
 
-### How to print scan progress
+### How should the scan be triggered
 
+In the main screen, add a scan button at the top. Clicking it would navigate to scan screen.
+
+Scan screen's top has following things:
+- A directory-chooser button to select directory
+- A scan button that only appears after a directory is chosen
+
+After scan button is pressed, scan progress is displayed on the screen.
+After scan finishes, print report and list not indexed video files by name.
+
+Ctrl + left click viedo file name would play the file
+
+### How to print scan progress
 Live update following items:
 - Scanned video file count
 - Scanned directory count
 - Found xxx moved videoes
-- Indexed xxx new videoes
 - Scanning file xxxxxx
