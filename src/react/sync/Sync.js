@@ -12,17 +12,20 @@ export default class Sync extends React.Component {
 		super(props);
 		this.state = {
 			directories: [],
-			status: "Loading indexed videos...",
+			status: null,
 			scanning: false,
 			indexedVideos: null,
 			notIndexedVideos: []
 		};
 		this.selectDirectories = this.selectDirectories.bind(this);
 		this.doSync = this.doSync.bind(this);
+		this.refreshIndexedVideos();
+	}
+
+	refreshIndexedVideos() {
 		new IPCInvoker("dataLoader").invoke("loadIndexedVideos").then(videos => {
 			this.setState({
-				indexedVideos: new IndexedVideos(videos),
-				status: `Loaded ${videos.length} indexed videos`
+				indexedVideos: new IndexedVideos(videos)
 			})
 		});
 	}
@@ -45,6 +48,7 @@ export default class Sync extends React.Component {
 		scanner.scan().then(v => {
 			this.setState({notIndexedVideos: v, scanning: false, status: scanner.status});
 			clearInterval(timer);
+			return this.refreshIndexedVideos();
 		});
 	}
 
@@ -58,7 +62,7 @@ export default class Sync extends React.Component {
 		return (<div>
 			<Navigation name="sync" />
 			<div id="sync">
-				{!this.state.scanning && <button onClick={this.selectDirectories}>选择文件夹</button>}
+				{<button disabled={this.state.scanning} onClick={this.selectDirectories}>选择文件夹</button>}
 				{diretoryDOMs.length > 0 && <ul id="directories">{diretoryDOMs}</ul>}
 				{this.dirSelected() && <button disabled={this.state.scanning || !this.state.indexedVideos} onClick={this.doSync}>同步</button>}
 				{this.state.status && <pre className="status">{this.state.status}</pre>}
