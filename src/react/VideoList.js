@@ -1,5 +1,6 @@
 import React from 'react';
 import Video from './video/Video'
+import Navigation from './navigation/Navigation'
 import './VideoList.css';
 const IPCInvoker = require('./ipc/IPCInvoker.js');
 
@@ -12,6 +13,9 @@ export default class VideoList extends React.Component {
 
 	render() {
 		let videoDOMs = this.state.videos.map(video => <Video {...video} key={video.path} />);
-		return (<div id="video-list">{videoDOMs}</div>)
+		return (<div>
+			<Navigation name="list" />
+			<div id="video-list">{videoDOMs}</div>
+		</div>)
 	}
 }
