@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 import CreateNewScreenshot from './CreateNewScreenshot';
 import VideoList from './VideoList'
-import Sync from './Sync'
+import Sync from './sync/Sync'
 
 export default function App() {
 	return (

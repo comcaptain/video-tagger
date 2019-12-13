@@ -1,10 +1,10 @@
 import React from "react";
-import Navigation from "./navigation/Navigation";
-import IndexedVideos from "./scanner/IndexedVideos"
+import Navigation from "../navigation/Navigation";
+import IndexedVideos from "./IndexedVideos"
 import './Sync.css'
 const dialog = require('electron').remote.dialog;
-const VideoScanner = require('./scanner/VideoScanner.js');
-const IPCInvoker = require('./ipc/IPCInvoker.js');
+const VideoScanner = require('./VideoScanner.js');
+const IPCInvoker = require('../ipc/IPCInvoker.js');
 
 export default class Sync extends React.Component {
 
