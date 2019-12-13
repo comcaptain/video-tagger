@@ -1,4 +1,4 @@
-.video-tags ul {
+.video-tags > ul {
     list-style: none;
     padding-left: 0;
     margin: 5px 0;
