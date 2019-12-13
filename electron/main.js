@@ -1,5 +1,5 @@
 // CHCP 65001
-const { app } = require('electron')
+const { app, Menu } = require('electron')
 const TakeScreenshotListener = require("./TakeScreenshotListener.js")
 const ReactWindow = require('./ReactWindow.js');
 const dataPersister = require('./dataPersister.js');
@@ -36,3 +36,5 @@ app.on('activate', () => {
 		createWindow();
 	}
 });
+
+Menu.setApplicationMenu(null);

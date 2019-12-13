@@ -27,7 +27,7 @@ module.exports = class TakeScreenshotListener {
 		robot.keyTap("c", ["control", "shift", "alt"]);
 		let videoFilePath = clipboard.readText();
 		let screenshot = new VideoScreenshot(SCREENSHOT_DIRECTORY, screenshotFileName, videoFilePath);
-		new ReactWindow(screenshot.toURL(), {noMenuBar: true, maximize: true}).open();
+		new ReactWindow(screenshot.toURL(), {maximize: true}).open();
 	}
 
 	watchForNewScreenshot() {

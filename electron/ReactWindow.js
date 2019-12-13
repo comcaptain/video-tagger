@@ -18,9 +18,6 @@ module.exports = class ReactWindow {
 
 	open() {
 		let reactWindow = new BrowserWindow(this._options);
-		if (this._options.noMenuBar) {
-			reactWindow.removeMenu();
-		}
 		if (this._options.maximize) {
 			reactWindow.maximize();
 		}
