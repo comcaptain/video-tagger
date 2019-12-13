@@ -1,14 +1,13 @@
 import React from 'react';
 import './Thumnail.css'
-const { exec } = require('child_process');
+const VideoPlayer = require('./VideoPlayer.js');
 
 export default class Thumnail extends React.Component {
 
 	handleClick(event) {
 		if (event.ctrlKey) {
-			let openCommand = `"C:\\Program Files\\DAUM\\PotPlayer\\PotPlayerMini64.exe" "${this.props.videoPath}" /seek=${this.props.seekPosition}`;
-			console.info("Executing command", openCommand);
-			exec(openCommand);
+			let videoPlayer = new VideoPlayer(this.props.videoPath, this.props.seekPosition);
+			videoPlayer.play();
 		}
 	}
 

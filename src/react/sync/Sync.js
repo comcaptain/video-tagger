@@ -6,6 +6,7 @@ import '../styles/buttons.css'
 const dialog = require('electron').remote.dialog;
 const VideoScanner = require('./VideoScanner.js');
 const IPCInvoker = require('../ipc/IPCInvoker.js');
+const VideoPlayer = require('../video/VideoPlayer');
 
 export default class Sync extends React.Component {
 
@@ -60,7 +61,7 @@ export default class Sync extends React.Component {
 
 	render() {
 		let diretoryDOMs = this.state.directories.map(v => <li key={v}>{v}</li>);
-		let notIndexedVideoDOMs = this.state.notIndexedVideos.map(v => <li key={v}>{v}</li>);
+		let notIndexedVideoDOMs = this.state.notIndexedVideos.map(v => <li key={v} onClick={() => new VideoPlayer(v).play()}>{v}</li>);
 		return (<div>
 			<Navigation name="sync" />
 			<div id="sync">

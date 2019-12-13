@@ -45,4 +45,5 @@
 	padding: 5px 8px;
     color: #043c09;
     border: 1px dashed silver;
+    cursor: url('/icons/play.svg'), auto;
 }
