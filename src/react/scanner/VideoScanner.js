@@ -9,10 +9,9 @@ const dataPersister = new IPCInvoker("dataPersister");
 
 const VIDEO_EXTENSIONS = new Set([".mp4", ".wmv", ".mkv", ".avi", ".rmvb", ".rm", ".flv", ".mov", ".3gp", ".VOB", ".MKV"]);
 
-class VideoScanner {
-	constructor(indexedVideos, updateStatusCallback, ...directories) {
+module.exports = class VideoScanner {
+	constructor(indexedVideos, directories) {
 		this._indexedVideos = indexedVideos;
-		this._updateStatusCallback = updateStatusCallback;
 		this._directories = directories;
 	}
 
@@ -26,19 +25,22 @@ class VideoScanner {
 		this.updateStatus("Scan started");
 		return Promise.all(this._directories.map(this.scanDirectory, this)).then(() => {
 			this.updateStatus("Scan finished")
+			return this._notIndexedVideoPaths;
 		})
 	}
 
-	updateStatus(status) {
-		this._updateStatusCallback(`Scanned ${this._scannedDirectoryCount} directories, \
+	updateStatus(...statuses) {
+		this.status = `Scanned ${this._scannedDirectoryCount} directories, \
 ${this._scannedFileCount} files, \
 ${this._scannedVideoFileCount} videos; \
 updated paths for ${this._updatePathCount} videos; \
 found ${this._notIndexedVideoPaths.length} not indexed videos
-${msToTime(new Date().getTime() - this._startTime)} ${status}`);
+${msToTime(new Date().getTime() - this._startTime)} ${statuses.join( )}`;
+		console.info(this.status);
 	}
 
 	scanDirectory(directory) {
+		this.updateStatus("Scanning directory", directory);
 		return fsReadDir(directory, {withFileTypes: true}).then(files => Promise.all(files.map(file => {
 			let fullPath = path.join(directory, file.name);
 
@@ -56,20 +58,29 @@ ${msToTime(new Date().getTime() - this._startTime)} ${status}`);
 			// Not video file, skip
 			if (!VIDEO_EXTENSIONS.has(extension)) return resolvedPromise;
 			this._scannedVideoFileCount++;
+			this.updateStatus("Found video file", fullPath);
 			
 			return this.isFileChanged(fullPath).then(isChanged => {
 				// Video is indexed and not changed, do nothing
-				if (!isChanged) return;
+				if (!isChanged) {
+					this.updateStatus(`Video file ${fullPath} is not changed, skip`)
+					return;
+				}
+				this.updateStatus("Calculating fingerprint for", fullPath);
 				return new FingerprintCalculator(fullPath).calculate().then(fingerprint => {
+					this.updateStatus(`Calculated! Fingerprint of ${fullPath} is ${fingerprint}`);
 					let videoID = this._indexedVideos.getVideoID(fingerprint);
 					// Found corresponding video record, update video path
 					if (videoID) {
+						this.updateStatus(`Video file is moved! Updating path to ${fullPath}`);
 						return dataPersister.invoke("updateVideoPath", videoID, fullPath).then(() => {
+							this.updateStatus(`Updated path to ${fullPath}`);
 							this._updatePathCount++;
 						})
 					}
 					// Not indexed file found
 					this._notIndexedVideoPaths.push(fullPath);
+					this.updateStatus("Not indexed file found", fullPath);
 				})
 			})
 		}))).then(() => this._scannedDirectoryCount++)
@@ -77,7 +88,7 @@ ${msToTime(new Date().getTime() - this._startTime)} ${status}`);
 
 	isFileChanged(fullPath) {
 		let storedMTime = this._indexedVideos.getModifiedTime(fullPath);
-		if (storedMTime === undefined) return Promise.resolved(true);
+		if (storedMTime === undefined) return Promise.resolve(true);
 
 		return fsStat(fullPath).then(stats => {
 			return stats.mtime.getTime() !== storedMTime.getTime();

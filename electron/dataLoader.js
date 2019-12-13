@@ -1,5 +1,4 @@
 const MongoClient = require('mongodb').MongoClient;
-const IndexedVideos = require("../src/share/IndexedVideos.js")
 
 class DataPersister {
 	constructor() {
@@ -22,7 +21,7 @@ class DataPersister {
 			return db.collection("Video").find({}).toArray();
 		}).then(videos => {
 			console.log(`Loaded ${videos.length} videos`);
-			return new IndexedVideos(videos);
+			return videos;
 		})
 	}
 
