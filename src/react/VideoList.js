@@ -8,7 +8,7 @@ export default class VideoList extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {videos: []};
-		new IPCInvoker("dataLoader").invoke("loadAllVideos").then(v => this.setState({videos: v}));
+		new IPCInvoker("dataLoader").invoke("loadAllVideos").then(v => this.setState({videos: v.reverse()}));
 	}
 
 	render() {
