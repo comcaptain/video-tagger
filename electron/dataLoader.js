@@ -70,7 +70,10 @@ class DataPersister {
 				seekPosition: v.seek_position,
 				screenshotPath: v.screenshot_path,
 				video_id: v.video_id
-			}));
+			})).sort((a, b) => {
+				if (a.seekPosition === b.seekPosition) return 0;
+				return a.seekPosition > b.seekPosition ? 1 : -1;
+			});
 		})
 	}
 
