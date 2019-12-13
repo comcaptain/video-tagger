@@ -1,5 +1,6 @@
 import React from "react";
 import './Navigation.css'
+const ReactWindow = require("electron").remote.require('./ReactWindow.js');
 
 const ROUTES = [
 	{name: "list", url: "/", description: "视频列表"},
@@ -8,8 +9,13 @@ const ROUTES = [
 
 export default class Navigation extends React.PureComponent {
 	
-	jumpTo(url) {
-		window.location.href = url;
+	handleClick(event, url) {
+		if (event.ctrlKey) {
+			new ReactWindow(url, {maximize: true}).open();
+		}
+		else {
+			window.location.href = url;
+		}
 	}
 
 	render() {
@@ -19,7 +25,7 @@ export default class Navigation extends React.PureComponent {
 				alt={route.name}
 				title={route.description}
 				className={this.props.name === route.name ? "selected nav-item" : "nav-item"}
-				onClick={() => this.jumpTo(route.url)}
+				onClick={e => this.handleClick(e, route.url)}
 				/>
 		</li>))
 		return (
