@@ -106,7 +106,33 @@ class DataPersister {
 	}
 
 	updateVideoPath(videoID, newVideoPath) {
-		return _dbPromise.then(db => db.updateOne({_id: videoID}, {$set: {path: newVideoPath}}))
+		console.info(`Updating path of video ${videoID} to ${newVideoPath}...`)
+		return this._dbPromise
+			.then(db => db.collection("Video"))
+			.then(collection => collection.updateOne({_id: videoID}, {$set: {path: newVideoPath}}))
+			.then(() => console.info(`Updated path of video ${videoID} to ${newVideoPath}`))
+	}
+
+	async refreshFingerprints() {
+		console.log("Refresh fingerprint, loading videos...")
+		this._dbPromise
+			.then(db => db.collection("Video"))
+			.then(collection => collection.find().project({path: 1}).toArray())
+			.then(videos => {
+				console.log(`Loaded ${videos.length} videos, refreshing fingerprints`);
+				return Promise.all(videos.map(video => this.refreshFingerprint(video._id, video.path)))
+			})
+			.then(() => console.info("Refreshed all fingerprints!"));
+	}
+
+	async refreshFingerprint(id, path) {
+		let collection = await this._dbPromise.then(db => db.collection("Video"));
+		return new FingerprintCalculator(path).calculate()
+			.then(fingerprint => {
+				console.info(`Fingerprint of ${path} is ${fingerprint}`)
+				return collection.updateOne({_id: id}, {$set: {fingerprint: fingerprint}});
+			})
+			.then(() => console.info("Refreshed fingerprint for", path))
 	}
 
 	insertVideo(videoCollection, videoPath, mtime) {
