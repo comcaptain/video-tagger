@@ -2,6 +2,7 @@ import React from "react";
 import Navigation from "../navigation/Navigation";
 import IndexedVideos from "./IndexedVideos"
 import './Sync.css'
+import '../styles/buttons.css'
 const dialog = require('electron').remote.dialog;
 const VideoScanner = require('./VideoScanner.js');
 const IPCInvoker = require('../ipc/IPCInvoker.js');
@@ -36,6 +37,7 @@ export default class Sync extends React.Component {
 			defaultPath: "V:\\",
 			properties: ['openDirectory', 'multiSelections']
 		});
+		if (!selectedDirectories) return;
 		this.setState({
 			directories: selectedDirectories
 		})
@@ -62,9 +64,9 @@ export default class Sync extends React.Component {
 		return (<div>
 			<Navigation name="sync" />
 			<div id="sync">
-				{<button disabled={this.state.scanning} onClick={this.selectDirectories}>选择文件夹</button>}
+				{<button className="action-button green" disabled={this.state.scanning} onClick={this.selectDirectories}>选择文件夹</button>}
 				{diretoryDOMs.length > 0 && <ul id="directories">{diretoryDOMs}</ul>}
-				{this.dirSelected() && <button disabled={this.state.scanning || !this.state.indexedVideos} onClick={this.doSync}>同步</button>}
+				{this.dirSelected() && <button className="action-button green" disabled={this.state.scanning || !this.state.indexedVideos} onClick={this.doSync}>同步</button>}
 				{this.state.status && <pre className="status">{this.state.status}</pre>}
 				{notIndexedVideoDOMs.length > 0 && <ul id="not-indexed-videos">{notIndexedVideoDOMs}</ul>}
 			</div>
