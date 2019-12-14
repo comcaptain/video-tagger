@@ -1,7 +1,7 @@
 ### Fix bugs
 
 - ~~When ctrl + alt + t is pressed, automatically stops watching directory change after 3 seconds~~
-- When clicking the sync button, reload indexed videos
+- ~~When clicking the sync button, reload indexed videos~~
 
 ### Features
 - Backup data

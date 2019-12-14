@@ -35,7 +35,7 @@ ${this._scannedFileCount} files, \
 ${this._scannedVideoFileCount} videos; \
 updated paths for ${this._updatePathCount} videos; \
 found ${this._notIndexedVideoPaths.length} not indexed videos
-${msToTime(new Date().getTime() - this._startTime)} ${statuses.join( )}`;
+${msToTime(new Date().getTime() - this._startTime)} ${statuses.join(' ')}`;
 		console.info(this.status);
 	}
 

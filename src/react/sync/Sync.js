@@ -16,20 +16,10 @@ export default class Sync extends React.Component {
 			directories: [],
 			status: null,
 			scanning: false,
-			indexedVideos: null,
 			notIndexedVideos: []
 		};
 		this.selectDirectories = this.selectDirectories.bind(this);
 		this.doSync = this.doSync.bind(this);
-		this.refreshIndexedVideos();
-	}
-
-	refreshIndexedVideos() {
-		new IPCInvoker("dataLoader").invoke("loadIndexedVideos").then(videos => {
-			this.setState({
-				indexedVideos: new IndexedVideos(videos)
-			})
-		});
 	}
 	
 	selectDirectories() {
@@ -44,14 +34,18 @@ export default class Sync extends React.Component {
 		})
 	}
 
-	doSync() {
-		this.setState({scanning: true});
-		let scanner = new VideoScanner(this.state.indexedVideos, this.state.directories, status => this.setState({status: status}));
+	async doSync() {
+		// Load indexed videos
+		this.setState({scanning: true, status: "Loading indexed videos"});
+		let videos = await new IPCInvoker("dataLoader").invoke("loadIndexedVideos");
+		this.setState({status: `Loaded ${videos.length}`});
+		
+		// Scan
+		let scanner = new VideoScanner(new IndexedVideos(videos), this.state.directories, status => this.setState({status: status}));
 		let timer = setInterval(() => this.setState({status: scanner.status}), 10);
 		scanner.scan().then(v => {
 			this.setState({notIndexedVideos: v, scanning: false, status: scanner.status});
 			clearInterval(timer);
-			return this.refreshIndexedVideos();
 		});
 	}
 
@@ -67,7 +61,7 @@ export default class Sync extends React.Component {
 			<div id="sync">
 				{<button className="action-button green" disabled={this.state.scanning} onClick={this.selectDirectories}>选择文件夹</button>}
 				{diretoryDOMs.length > 0 && <ul id="directories">{diretoryDOMs}</ul>}
-				{this.dirSelected() && <button className="action-button green" disabled={this.state.scanning || !this.state.indexedVideos} onClick={this.doSync}>同步</button>}
+				{this.dirSelected() && <button className="action-button green" disabled={this.state.scanning} onClick={this.doSync}>同步</button>}
 				{this.state.status && <pre className="status">{this.state.status}</pre>}
 				{notIndexedVideoDOMs.length > 0 && <ul id="not-indexed-videos">{notIndexedVideoDOMs}</ul>}
 			</div>
