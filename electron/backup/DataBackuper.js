@@ -1,9 +1,9 @@
-const MongoClient = require('mongodb').MongoClient;
 const fs = require('fs');
 const util = require('util');
 const fsMkdir = util.promisify(fs.mkdir);
 const path = require('path');
 const formatDate = require('dateformat');
+const exec = util.promisify(require('child_process').exec);
 
 class DataBackuper {
 	constructor(backupDirectory) {
@@ -11,20 +11,17 @@ class DataBackuper {
 	}
 
 	async backup() {
-		await this.createBackupDIR();
-		this.backupDB();
-	}
-
-	async createBackupDIR() {
-		console.info("Creating backup dir", this._backupDirectory);
 		await fsMkdir(this._backupDirectory, {recursive: true});
-		console.info("Created backup dir", this._backupDirectory);
+		return Promise.all([this.backupDB()])
 	}
 
-	backupDB() {
-		console.log("Backup to", this._backupDirectory)
+	async backupDB() {
+		console.info("Doing DB backup...")
+		let dbDIR = path.join(this._backupDirectory, "db");
+		await fsMkdir(dbDIR, {recursive: true});
+		await exec(`mongodump --db=video-tagger --out=${dbDIR}`);
+		console.info("Finished DB backup");
 	}
 }
-
 let dataBackuper = new DataBackuper("d:/backups")
-dataBackuper.backup();
+dataBackuper.backup().then(() => console.log("backup finished"));
