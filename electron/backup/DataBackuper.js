@@ -8,6 +8,7 @@ const formatDate = require('dateformat');
 const exec = util.promisify(require('child_process').exec);
 const conf = require('../../src/share/conf.js')
 const archiver = require('archiver');
+const BackupDataCleaner = require('./BackupDataCleaner.js');
 
 class DataBackuper {
 	constructor(backupDirectories) {
@@ -20,6 +21,7 @@ class DataBackuper {
 		await Promise.all([this.backupDB(), this.backupScreenshots()]);
 		let archivedBackupPath = await this.archiveBackupDir();
 		await this.copyToAllBackupDirs(archivedBackupPath);
+		return Promise.all(this._backupDirs.map(v => new BackupDataCleaner(v).clean()));
 	}
 
 	async copyToAllBackupDirs(archivedBackupPath) {
