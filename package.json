@@ -30,7 +30,7 @@
     "@testing-library/user-event": "^7.1.2",
     "electron-is-dev": "^1.1.0",
     "mongodb": "^3.3.5",
-    "node-process-windows": "^0.0.2",
+    "node-process-windows": "https://github.com/adamsoutar/node-process-windows.git#master",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-router-dom": "^5.1.2",
