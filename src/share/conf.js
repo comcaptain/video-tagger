@@ -4,7 +4,7 @@ module.exports = {
 	// If you want to change this, you have to update the backup command in DataBackuper.js
 	mongo_db_url: "mongodb://localhost:27017",
 	mongo_db_name: "video-tagger",
-	backup_directory: "D:/backups",
+	backup_directories: ["D:/backups/video-tagger", "Z:/Tony/backups/video-tagger"],
 	// Check https://electronjs.org/docs/api/accelerator for available values
 	take_screenshot_hotkey: "Ctrl+Alt+T",
 	// Check https://robotjs.io/docs/syntax#keys for available values
