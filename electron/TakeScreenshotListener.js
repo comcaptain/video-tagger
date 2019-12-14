@@ -32,6 +32,7 @@ module.exports = class TakeScreenshotListener {
 		// 250 delay is necessary, otherwise ctrl e would not work
 		setTimeout(() => robot.keyTap("e", "control"), 250);
 		let screenshotFileName = await this.watchForNewScreenshot();
+		if (!screenshotFileName) return;
 		robot.keyTap("c", ["control", "shift", "alt"]);
 		let videoFilePath = clipboard.readText();
 		let screenshot = new VideoScreenshot(SCREENSHOT_DIRECTORY, screenshotFileName, videoFilePath);
@@ -40,11 +41,20 @@ module.exports = class TakeScreenshotListener {
 
 	watchForNewScreenshot() {
 		return new Promise((resolve, reject) => {
+			let timeoutID;
 			let watcher = fs.watch(SCREENSHOT_DIRECTORY, (eventType, filename) => {
 				if (!filename) return;
+				clearTimeout(timeoutID);
 				watcher.close();
-				resolve(resolve(filename))
+				console.info("Screnshot is taken", filename);
+				resolve(filename);
 			});
+			console.log("Wait 3 seconds for screenshot to be taken")
+			timeoutID = setTimeout(() => {
+				watcher.close();
+				console.log("Screnshot is not taken within 3 seconds, stop waiting");
+				resolve(null);
+			}, 3000);
 		});
 	}
 }
