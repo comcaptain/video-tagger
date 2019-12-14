@@ -25,7 +25,7 @@ module.exports = class VideoScanner {
 		this.updateStatus("Scan started");
 		return Promise.all(this._directories.map(this.scanDirectory, this)).then(() => {
 			this.updateStatus("Scan finished")
-			return this._notIndexedVideoPaths;
+			return this._notIndexedVideoPaths.sort();
 		})
 	}
 
