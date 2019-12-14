@@ -4,6 +4,9 @@ const fs = require('fs')
 const robot = require("robotjs");
 const VideoScreenshot = require("./VideoScreenshot.js");
 const ReactWindow = require('./ReactWindow.js');
+const processWindows = require("node-process-windows");
+const util = require('util');
+const getActiveWindow = util.promisify(processWindows.getActiveWindow);
 
 module.exports = class TakeScreenshotListener {
 	constructor(hotKey) {
@@ -21,6 +24,11 @@ module.exports = class TakeScreenshotListener {
 
 	async onTakeScreenshot() {
 		console.info("Take screenshot triggered")
+		let processName = await getActiveWindow().then(activeWindow => activeWindow.ProcessName);
+		if (!processName.includes("PotPlayer")) {
+			console.info(`Active window's process name is ${processName}, not PotPlayer, do nothing`)
+			return;
+		}
 		// 250 delay is necessary, otherwise ctrl e would not work
 		setTimeout(() => robot.keyTap("e", "control"), 250);
 		let screenshotFileName = await this.watchForNewScreenshot();
