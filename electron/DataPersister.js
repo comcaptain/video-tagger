@@ -1,5 +1,5 @@
-const SCRENSHOTS_DIR = "F:/video-tagger-data/screenshots"
 const MongoClient = require('mongodb').MongoClient;
+const conf = require('../src/share/conf.js');
 const fs = require("fs");
 const path = require('path');
 const util = require('util');
@@ -9,7 +9,7 @@ const FingerprintCalculator = require("../src/share/FingerprintCalculator.js");
 
 class DataPersister {
 	constructor() {
-		this._dbPromise = new MongoClient("mongodb://localhost:27017", {useUnifiedTopology: true}).connect().then(client => client.db("video-tagger"));
+		this._dbPromise = new MongoClient(conf.mongo_db_url, {useUnifiedTopology: true}).connect().then(client => client.db(conf.mongo_db_name));
 	}
 
 	async persist(screenshot, tagNames) {
@@ -69,7 +69,7 @@ class DataPersister {
 
 	async persistVideoScreenshot(screenshot) {
 		let filePath = screenshot.screenshotFilePath;
-		let newFilePath = SCRENSHOTS_DIR + "/" + path.basename(filePath, ".jpg") + new Date().getTime() + ".jpg";
+		let newFilePath = conf.screenshot_directory + "/" + path.basename(filePath, ".jpg") + new Date().getTime() + ".jpg";
 		let db = await this._dbPromise;
 		return fsRename(filePath, newFilePath).then(() => {
 			console.log(`Moved screenshot file from ${filePath} to ${newFilePath}`);

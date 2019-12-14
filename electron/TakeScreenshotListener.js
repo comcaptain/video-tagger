@@ -1,4 +1,4 @@
-const SCREENSHOT_DIRECTORY = 'F:/video-tagger-data/potplayer-screenshot';
+const conf = require('../src/share/conf.js');
 const { globalShortcut, clipboard, BrowserWindow } = require('electron')
 const fs = require('fs')
 const robot = require("robotjs");
@@ -30,31 +30,31 @@ module.exports = class TakeScreenshotListener {
 			return;
 		}
 		// 250 delay is necessary, otherwise ctrl e would not work
-		setTimeout(() => robot.keyTap("e", "control"), 250);
+		setTimeout(() => robot.keyTap.apply(robot, conf.potplayer_take_screenshot_hotkey), 250);
 		let screenshotFileName = await this.watchForNewScreenshot();
 		if (!screenshotFileName) return;
-		robot.keyTap("c", ["control", "shift", "alt"]);
+		robot.keyTap.apply(robot, conf.potplayer_copy_video_path_hotkey);
 		let videoFilePath = clipboard.readText();
-		let screenshot = new VideoScreenshot(SCREENSHOT_DIRECTORY, screenshotFileName, videoFilePath);
+		let screenshot = new VideoScreenshot(conf.potplayer_screenshot_directory, screenshotFileName, videoFilePath);
 		new ReactWindow(screenshot.toURL(), {maximize: true}).open();
 	}
 
 	watchForNewScreenshot() {
 		return new Promise((resolve, reject) => {
 			let timeoutID;
-			let watcher = fs.watch(SCREENSHOT_DIRECTORY, (eventType, filename) => {
+			let watcher = fs.watch(conf.potplayer_screenshot_directory, (eventType, filename) => {
 				if (!filename) return;
 				clearTimeout(timeoutID);
 				watcher.close();
 				console.info("Screnshot is taken", filename);
 				resolve(filename);
 			});
-			console.log("Wait 3 seconds for screenshot to be taken")
+			console.log(`Wait ${conf.wait_for_screenshot_delay} milliseconds for screenshot to be taken`)
 			timeoutID = setTimeout(() => {
 				watcher.close();
-				console.log("Screnshot is not taken within 3 seconds, stop waiting");
+				console.log(`Screnshot is not taken within ${conf.wait_for_screenshot_delay} milliseconds, stop waiting`);
 				resolve(null);
-			}, 3000);
+			}, conf.wait_for_screenshot_delay);
 		});
 	}
 }

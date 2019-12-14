@@ -1,4 +1,5 @@
 // CHCP 65001
+const conf = require('../src/share/conf.js');
 const { app, Menu } = require('electron')
 const TakeScreenshotListener = require("./TakeScreenshotListener.js")
 const ReactWindow = require('./ReactWindow.js');
@@ -14,7 +15,7 @@ function createWindow() {
 }
 
 app.on('ready', function() {
-	new TakeScreenshotListener("Ctrl+Alt+T").startListening();
+	new TakeScreenshotListener(conf.take_screenshot_hotkey).startListening();
 	new IPCInvokerServer(dataLoader, "dataLoader").start();
 	new IPCInvokerServer(dataPersister, "dataPersister").start();
 	createWindow();

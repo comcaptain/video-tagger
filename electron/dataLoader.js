@@ -1,8 +1,9 @@
 const MongoClient = require('mongodb').MongoClient;
+const conf = require('../src/share/conf.js');
 
 class DataPersister {
 	constructor() {
-		this._dbPromise = new MongoClient("mongodb://localhost:27017", {useUnifiedTopology: true}).connect().then(client => client.db("video-tagger"));
+		this._dbPromise = new MongoClient(conf.mongo_db_url, {useUnifiedTopology: true}).connect().then(client => client.db(conf.mongo_db_name));
 	}
 
 	loadAllTags() {
