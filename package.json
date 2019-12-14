@@ -28,6 +28,7 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "dateformat": "^3.0.3",
     "electron-is-dev": "^1.1.0",
     "mongodb": "^3.3.5",
     "node-process-windows": "https://github.com/adamsoutar/node-process-windows.git#master",
@@ -47,7 +48,8 @@
     "dev-server": "cross-env BROWSER=none yarn start",
     "postinstall": "electron-builder install-app-deps",
     "preelectron-pack": "yarn build",
-    "electron-pack": "electron-builder -w"
+    "electron-pack": "electron-builder -w",
+    "backup": "node electron/backup/DataBackuper.js"
   },
   "eslintConfig": {
     "extends": "react-app"
