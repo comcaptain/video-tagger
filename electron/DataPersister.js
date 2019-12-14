@@ -14,6 +14,7 @@ class DataPersister {
 
 	async persist(screenshot, tagNames) {
 		let [tagIDs, videoScreenshot] = await Promise.all([this.loadOrSaveTags(tagNames), this.persistVideoScreenshot(screenshot)]);
+		if (tagNames.length === 0) return;
 		return this._dbPromise.then(db => {
 			let tagPoints = tagIDs.map(tagID => ({
 				tag_id: tagID,
