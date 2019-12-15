@@ -1,5 +1,6 @@
 import React from 'react';
-import './AddNewTag.css';
+import './AddNewTag.scss';
+import Tag from './Tag';
 const IPCInvoker = require('../ipc/IPCInvoker.js');
 
 export default class AddNewTag extends React.Component {
@@ -112,16 +113,7 @@ export default class AddNewTag extends React.Component {
 
 	render() {
 		if (!this.state.visible) return null;
-		let tagDOMs = this.state.tags.map((tag, index) => {
-			return (
-				<li 
-					key={tag.name} 
-					className={index === this.state.selectedIndex ? "selected" : null}
-					>
-					{tag.name} ({tag.videoCount})
-				</li>
-			)
-		})
+		let tagDOMs = this.state.tags.map((tag, index) => <Tag selected={index === this.state.selectedIndex} tag={tag} key={tag.name} />);
 		let tagsDOM = tagDOMs.length > 0 ? <ul>{tagDOMs}</ul> : null;
 		return (
 			<div className="add-new-tag">

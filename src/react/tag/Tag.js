@@ -10,10 +10,13 @@ export default function Tag(props) {
 	}
 	else {
 		tagName = tag.name;
-		videoCount = ` (${tag.videoCount})`;
+		videoCount = `(${tag.videoCount})`;
 	}
+	let classNames = ["video-tag"];
+	if (props.handleRemoveTag) classNames.push("removable");
+	if (props.selected) classNames.push("selected");
 	return (
-		<li className={"video-tag" + (props.handleRemoveTag ? " removable" : "")}>
+		<li className={classNames.join(" ")}>
 			{tagName}{videoCount}
 			{props.handleRemoveTag && (<button 
 				className="remove-tag" 
