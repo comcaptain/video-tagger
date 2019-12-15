@@ -1,6 +1,7 @@
 module.exports = {
 	screenshot_directory: "F:/video-tagger-data/screenshots",
 	potplayer_screenshot_directory: "F:/video-tagger-data/potplayer-screenshot",
+	log_directory: "F:/video-tagger-data/logs",
 	// If you want to change this, you have to update the backup command in DataBackuper.js
 	mongo_db_url: "mongodb://localhost:27017",
 	mongo_db_name: "video-tagger",
