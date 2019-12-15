@@ -2,7 +2,7 @@ import React from "react";
 import Navigation from "../navigation/Navigation";
 import IndexedVideos from "./IndexedVideos"
 import './Sync.css'
-import '../styles/buttons.css'
+import '../styles/buttons.scss'
 const dialog = require('electron').remote.dialog;
 const VideoScanner = require('./VideoScanner.js');
 const IPCInvoker = require('../ipc/IPCInvoker.js');
