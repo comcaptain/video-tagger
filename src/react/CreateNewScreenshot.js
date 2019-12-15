@@ -3,7 +3,6 @@ import Tags from './tag/Tags';
 import './CreateNewScreenshot.css';
 const { remote } = require('electron');
 const IPCInvoker = require('./ipc/IPCInvoker.js');
-const pinyin = require("chinese-to-pinyin");
 
 export default class CreateNewScreenshot extends React.Component {
 	constructor(props) {
@@ -13,12 +12,8 @@ export default class CreateNewScreenshot extends React.Component {
 			videoFilePath: parameters.get("videoFilePath"),
 			screenshotFilePath: parameters.get("screenshotFilePath"),
 			seekPosition: parameters.get("seekPosition"),
-			allTagNames: [],
 			tagNames: []
 		}
-		new IPCInvoker("dataLoader").invoke("loadAllTags").then(allTags => this.setState({
-			allTagNames: allTags.map(v => ({value: v.name, pinyin: pinyin(v.name, {removeTone: true, removeSpace: true})})).sort((a, b) => a.pinyin > b.pinyin ? 1 : -1)
-		}));
 	}
 
 	handleSave() {
@@ -62,7 +57,6 @@ export default class CreateNewScreenshot extends React.Component {
 		return (
 			<div id="create-new-tag">
 				<Tags 
-					allTagNames={this.state.allTagNames} 
 					tagNames={this.state.tagNames}
 					handleAddNewTag={this.handleAddNewTag.bind(this)}
 					handleRemoveTag={this.handleRemoveTag.bind(this)}

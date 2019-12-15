@@ -1,19 +1,33 @@
 const MongoClient = require('mongodb').MongoClient;
 const conf = require('../src/share/conf.js');
+const pinyin = require("chinese-to-pinyin");
 
 class DataPersister {
 	constructor() {
 		this._dbPromise = new MongoClient(conf.mongo_db_url, {useUnifiedTopology: true}).connect().then(client => client.db(conf.mongo_db_name));
 	}
 
-	loadAllTags() {
-		return this._dbPromise.then(db => {
-			console.log("Loading all tags")
-			return db.collection("Tag").find({}).project({name: 1}).toArray();
-		}).then(tags => {
-			console.log(`Loaded ${tags.length} tags`);
-			return tags;
-		})
+	async loadAllTags() {
+		let tagIDToNameMap = await this.loadTagIDToNameMap();
+		console.info("Loading video count per tag...")
+		let db = await this._dbPromise;
+		let groups = await db.collection("TagPoint").aggregate( 
+            [
+                {"$group": { "_id": "$tag_id", video_ids: {$addToSet: "$video_id"} } }
+            ]
+        ).toArray();
+        console.info("Loaded")
+        return groups.map(group => {
+        	let tagID = group._id;
+        	let tagName = tagIDToNameMap[tagID];
+        	let nameInPinyin = pinyin(tagName, {removeTone: true, removeSpace: true});
+        	return {
+        		id: tagID,
+        		name: tagName,
+        		pinyin: nameInPinyin,
+        		videoCount: group.video_ids.length
+        	}
+        });
 	}
 
 	async loadIndexedVideos() {
@@ -36,16 +50,14 @@ class DataPersister {
 			delete screenshot.video_id;
 			videoIDToScreenshots[videoID].push(screenshot);
 		})
-		return this._dbPromise.then(db => {
-			console.log("Loading videos");
-			return db.collection("Video").find({}).project({path: 1}).toArray();
-		}).then(videos => {
-			console.log(`Loaded ${videos.length} videos`);
-			return videos.map(v => ({
-				path: v.path,
-				screenshots: videoIDToScreenshots[v._id],
-			}));
-		})
+		console.log("Loading videos");
+		let db = await this._dbPromise;
+        let videos = await db.collection("Video").find({}).project({path: 1}).toArray();
+		console.log(`Loaded ${videos.length} videos`);
+		return videos.map(v => ({
+			path: v.path,
+			screenshots: videoIDToScreenshots[v._id],
+		}));
 	}
 
 	async loadAllScreenshots() {

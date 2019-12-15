@@ -1,47 +1,53 @@
 import React from 'react';
 import './AddNewTag.css';
+const IPCInvoker = require('../ipc/IPCInvoker.js');
 
 export default class AddNewTag extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = this.getInitialState();
-	}
-
-	getInitialState() {
-		return {
+		this.state = {
 			visible: false,
-			tagNames: this.getDefaultTags(),
+			allTags: [],
+			tags: [],
 			selectedIndex: null,
 			value: ""
-		}
+		};
+		new IPCInvoker("dataLoader").invoke("loadAllTags").then(allTags => {
+			let newState = {allTags: allTags};
+			if (!this.state.value) newState.tags = this.sortTags(allTags.slice());
+			this.setState(newState);
+		});	
+	}
+
+	sortTags(tags) {
+		return tags.sort((a, b) => b.videoCount - a.videoCount)
 	}
 
 	show() {
-		this.setState({visible: true})
+		this.setState({
+			tags: this.sortTags(this.state.allTags.slice()),
+			visible: true,
+			selectedIndex: null,
+			value: ""
+		});
 	}
 
 	dismiss() {
-		this.setState(this.getInitialState())
-	}
-
-	getDefaultTags() {
-		return this.props.allTagNames.slice(0, 10).map(v => v.value);
+		this.setState({visible: false})
 	}
 
 	handleChange(event) {
 		let value = event.target.value;
-		let tagNames;
+		let tags;
 		if (value.trim() === "") {
-			tagNames = this.getDefaultTags();
+			tags = this.state.allTags.slice();
 		}
 		else {
 			let keyword = value.toLowerCase();
-			tagNames = this.props.allTagNames
-				.filter(tagName => tagName.value.toLowerCase().includes(keyword) || tagName.pinyin.includes(keyword))
-				.map(v => v.value);
+			tags = this.state.allTags.filter(tag => tag.name.toLowerCase().includes(keyword) || tag.pinyin.includes(keyword));
 		}
 		this.setState({
-			tagNames: tagNames,
+			tags: this.sortTags(tags),
 			selectedIndex: null,
 			value: value
 		})
@@ -63,7 +69,7 @@ export default class AddNewTag extends React.Component {
 				nextIndex = 0;
 			}
 			else if (selectedIndex === null) {
-				nextIndex = this.state.tagNames.length - 1;
+				nextIndex = this.state.tags.length - 1;
 			}
 			else {
 				nextIndex = selectedIndex - 1;
@@ -71,7 +77,7 @@ export default class AddNewTag extends React.Component {
 		}
 		else if (event.key === 'ArrowDown') {
 			event.preventDefault();
-			if (selectedIndex === this.state.tagNames.length - 1) {
+			if (selectedIndex === this.state.tags.length - 1) {
 				nextIndex = selectedIndex;
 			}
 			else if (selectedIndex === null) {
@@ -89,7 +95,7 @@ export default class AddNewTag extends React.Component {
 		if (nextIndex !== undefined) {
 			this.setState({
 				selectedIndex: nextIndex,
-				value: this.state.tagNames[nextIndex]
+				value: this.state.tags[nextIndex].name
 			})
 		}
 
@@ -106,13 +112,13 @@ export default class AddNewTag extends React.Component {
 
 	render() {
 		if (!this.state.visible) return null;
-		let tagDOMs = this.state.tagNames.map((tagName, index) => {
+		let tagDOMs = this.state.tags.map((tag, index) => {
 			return (
 				<li 
-					key={tagName} 
+					key={tag.name} 
 					className={index === this.state.selectedIndex ? "selected" : null}
 					>
-					{tagName}
+					{tag.name} ({tag.videoCount})
 				</li>
 			)
 		})

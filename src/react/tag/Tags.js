@@ -1,7 +1,8 @@
 import React from 'react';
 import AddNewTag from './AddNewTag';
 import './Tags.css';
-export default function(props) {
+
+export default function Tags(props) {
 	let tagsDOM = props.tagNames.map(tagName => (
 		<li key={tagName} className={"video-tag" + (props.handleRemoveTag ? " removable" : "")}>
 			{tagName}
@@ -14,10 +15,7 @@ export default function(props) {
 	return (
 		<div className="video-tags">
 			<ul>{tagsDOM}</ul>
-			{props.handleAddNewTag && (<AddNewTag 
-				allTagNames={props.allTagNames} 
-				handleAddNewTag={props.handleAddNewTag} />)
-			}
+			{props.handleAddNewTag && (<AddNewTag handleAddNewTag={props.handleAddNewTag} />)}
 		</div>
 	)
-};
+}
