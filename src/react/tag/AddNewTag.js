@@ -65,7 +65,7 @@ export default class AddNewTag extends React.Component {
 		else if (event.key === 'Escape') {
 			this.dismiss();
 		}
-		else if (event.key === 'ArrowUp') {
+		else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
 			event.preventDefault();
 			if (selectedIndex === 0) {
 				nextIndex = 0;
@@ -77,7 +77,7 @@ export default class AddNewTag extends React.Component {
 				nextIndex = selectedIndex - 1;
 			}
 		}
-		else if (event.key === 'ArrowDown') {
+		else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
 			event.preventDefault();
 			if (selectedIndex === this.state.tags.length - 1) {
 				nextIndex = selectedIndex;
