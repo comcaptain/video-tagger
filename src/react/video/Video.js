@@ -11,7 +11,7 @@ export default function Video(props) {
 	return (
 		<div className="video">
 			<div className="video-meta-data">				
-				<Tags tagNames={tagNames} />
+				<Tags tags={tagNames} />
 				<span className="path">{props.path}</span>
 			</div>
 			<div className="thumnails">{thumnailDOMs}</div>

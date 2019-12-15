@@ -57,7 +57,7 @@ export default class CreateNewScreenshot extends React.Component {
 		return (
 			<div id="create-new-tag">
 				<Tags 
-					tagNames={this.state.tagNames}
+					tags={this.state.tagNames}
 					handleAddNewTag={this.handleAddNewTag.bind(this)}
 					handleRemoveTag={this.handleRemoveTag.bind(this)}
 				/>
