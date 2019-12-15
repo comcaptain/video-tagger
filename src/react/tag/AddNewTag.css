@@ -40,6 +40,8 @@
 	list-style: none;
 	line-height: 26px;
 	padding: 7px 0;
+	overflow-y: auto;
+	max-height: 500px;
 }
 
 .add-new-tag li {

@@ -25,7 +25,7 @@ export default class AddNewTag extends React.Component {
 	}
 
 	getDefaultTags() {
-		return this.props.allTagNames.slice(0, 10);
+		return this.props.allTagNames.slice(0, 10).map(v => v.value);
 	}
 
 	handleChange(event) {
@@ -36,7 +36,9 @@ export default class AddNewTag extends React.Component {
 		}
 		else {
 			let keyword = value.toLowerCase();
-			tagNames = this.props.allTagNames.filter(tagName => tagName.toLowerCase().includes(keyword));
+			tagNames = this.props.allTagNames
+				.filter(tagName => tagName.value.toLowerCase().includes(keyword) || tagName.pinyin.includes(keyword))
+				.map(v => v.value);
 		}
 		this.setState({
 			tagNames: tagNames,
