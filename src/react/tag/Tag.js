@@ -15,9 +15,10 @@ export default function Tag(props) {
 	let classNames = ["video-tag"];
 	if (props.handleRemoveTag) classNames.push("removable");
 	if (props.selected) classNames.push("selected");
+	if (props.handleClick) classNames.push("clickable");
 	return (
 		<li className={classNames.join(" ")}>
-			{tagName}{videoCount}
+			<span onClick={props.handleClick ? () => props.handleClick(tag) : null}>{tagName}{videoCount}</span>
 			{props.handleRemoveTag && (<button 
 				className="remove-tag" 
 				onClick={e => props.handleRemoveTag(tagName)}>x</button>)

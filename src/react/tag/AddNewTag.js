@@ -18,6 +18,7 @@ export default class AddNewTag extends React.Component {
 			if (!this.state.value) newState.tags = this.sortTags(allTags.slice());
 			this.setState(newState);
 		});	
+		this.handleTagClick = this.handleTagClick.bind(this);
 	}
 
 	sortTags(tags) {
@@ -111,9 +112,14 @@ export default class AddNewTag extends React.Component {
 		document.removeEventListener("keydown", this._listener);
 	}
 
+	handleTagClick(tag) {
+		this.props.handleAddNewTag(tag.name)
+	}
+
 	render() {
 		if (!this.state.visible) return null;
-		let tagDOMs = this.state.tags.map((tag, index) => <Tag selected={index === this.state.selectedIndex} tag={tag} key={tag.name} />);
+		let tagDOMs = this.state.tags.map((tag, index) => 
+			<Tag selected={index === this.state.selectedIndex} tag={tag} key={tag.name} handleClick={this.handleTagClick} />);
 		let tagsDOM = tagDOMs.length > 0 ? <ul>{tagDOMs}</ul> : null;
 		return (
 			<div className="add-new-tag">
