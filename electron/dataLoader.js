@@ -16,14 +16,12 @@ class DataPersister {
 		})
 	}
 
-	loadIndexedVideos() {
-		return this._dbPromise.then(db => {
-			console.log("Loading videos");
-			return db.collection("Video").find({}).toArray();
-		}).then(videos => {
-			console.log(`Loaded ${videos.length} videos`);
-			return videos;
-		})
+	async loadIndexedVideos() {
+		console.log("Loading videos");
+		let db = await this._dbPromise;
+		let videos = await db.collection("Video").find({}).toArray();
+		console.log(`Loaded ${videos.length} videos`);
+		return videos;
 	}
 
 	async loadAllVideos() {
@@ -77,17 +75,25 @@ class DataPersister {
 		})
 	}
 
+	async loadTagIDToNameMap() {
+		console.log("Loading tag ID to name map...")
+		let db = await this._dbPromise;
+		let tags = await db.collection("Tag").find({}).project({name: 1}).toArray();
+		console.log(`Loaded, found ${tags.length} tags`)
+		let tagIDToNameMap = {};
+		tags.forEach(tag => tagIDToNameMap[tag._id] = tag.name);
+		return tagIDToNameMap;
+	}
+
 	async loadAllTagPoints() {
-		let allTags = await this.loadAllTags();
-		let tagIDToName = {};
-		allTags.forEach(tag => tagIDToName[tag._id] = tag.name);
+		let tagIDToNameMap = await this.loadTagIDToNameMap();
 		return this._dbPromise.then(db => {
 			console.log("Loading TagPoints");
 			return db.collection("TagPoint").find({}).project({tag_id: 1, screenshot_id: 1}).toArray();
 		}).then(tagPoints => {
 			console.log(`Loaded ${tagPoints.length} tagPoints`);
 			return tagPoints.map(tagPoint => ({
-				tag_name: tagIDToName[tagPoint.tag_id],
+				tag_name: tagIDToNameMap[tagPoint.tag_id],
 				screenshot_id: tagPoint.screenshot_id
 			}))
 		})

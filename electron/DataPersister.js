@@ -32,40 +32,34 @@ class DataPersister {
 	async loadOrSaveTags(tagNames) {
 		console.info("Load or save tags", tagNames);
 		let db = await this._dbPromise;
-		return this.loadAllTags().then(savedTags => {
-			let tagNameToIDMap = {};
-			for (let savedTag of savedTags) {
-				if (tagNameToIDMap[savedTag.name]) throw "Duplicate tag found " + savedTag.name;
-				tagNameToIDMap[savedTag.name] = savedTag._id;
-			}
-			let tagIDs = [];
-			let createTime = new Date();
-			let newTags = tagNames.filter(tagName => {
-				let tagID = tagNameToIDMap[tagName];
-				if (tagID) tagIDs.push(tagID);
-				return !tagID;
-			}).map(tagName => ({
-				name: tagName,
-				create_time: createTime
-			}));
-			if (newTags.length === 0) return tagIDs;
-			console.log(`Inserting ${newTags.length} new Tag records:`, newTags)
-			return db.collection("Tag").insertMany(newTags).then(o => {
-				let savedNewTags = o.ops;
-				console.log(`Inserted ${savedNewTags.length} new Tag records`);
-				return tagIDs.concat(savedNewTags.map(v => v._id));
-			})
-		});
+		let tagNameToIDMap = await this.loadTagNameToIDMap();
+		let tagIDs = [];
+		let createTime = new Date();
+		let newTags = tagNames.filter(tagName => {
+			let tagID = tagNameToIDMap[tagName];
+			if (tagID) tagIDs.push(tagID);
+			return !tagID;
+		}).map(tagName => ({
+			name: tagName,
+			create_time: createTime
+		}));
+		if (newTags.length === 0) return tagIDs;
+		console.log(`Inserting ${newTags.length} new Tag records:`, newTags)
+		return db.collection("Tag").insertMany(newTags).then(o => {
+			let savedNewTags = o.ops;
+			console.log(`Inserted ${savedNewTags.length} new Tag records`);
+			return tagIDs.concat(savedNewTags.map(v => v._id));
+		})
 	}
 
-	loadAllTags() {
-		return this._dbPromise.then(db => {
-			console.log("Loading all tags")
-			return db.collection("Tag").find({}).project({name: 1}).toArray();
-		}).then(tags => {
-			console.log(`Loaded ${tags.length} tags`);
-			return tags;
-		})
+	async loadTagNameToIDMap() {
+		console.log("Loading tag name to ID map...")
+		let db = await this._dbPromise;
+		let tags = await db.collection("Tag").find({}).project({name: 1}).toArray();
+		console.log(`Loaded, found ${tags.length} tags`)
+		let tagNameToIDMap = {};
+		tags.forEach(tag => tagNameToIDMap[tag.name] = tag._id);
+		return tagNameToIDMap;
 	}
 
 	async persistVideoScreenshot(screenshot) {
