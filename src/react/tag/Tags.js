@@ -9,7 +9,7 @@ export default function Tags(props) {
 	return (
 		<div className="video-tags">
 			<ul>{tagsDOM}</ul>
-			{props.handleAddNewTag && (<AddNewTag handleAddNewTag={props.handleAddNewTag} />)}
+			{props.handleAddNewTag && (<AddNewTag videoIDs={props.videoIDs} handleAddNewTag={props.handleAddNewTag} />)}
 		</div>
 	)
 }

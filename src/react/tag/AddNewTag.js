@@ -9,115 +9,147 @@ export default class AddNewTag extends React.Component {
 		this.state = {
 			visible: false,
 			allTags: [],
-			tags: [],
 			selectedIndex: null,
-			value: ""
+			value: "",
+			frozenHints: null
 		};
-		new IPCInvoker("dataLoader").invoke("loadAllTags").then(allTags => {
-			let newState = {allTags: allTags};
-			if (!this.state.value) newState.tags = this.sortTags(allTags.slice());
-			this.setState(newState);
-		});	
+		new IPCInvoker("dataLoader").invoke("loadAllTags").then(allTags => this.setState({allTags: allTags}));	
 		this.handleTagClick = this.handleTagClick.bind(this);
+		this.handleGlobalKeyDown = this.handleGlobalKeyDown.bind(this);
 	}
 
-	sortTags(tags) {
-		return tags.sort((a, b) => b.videoCount - a.videoCount)
+	filterByVideoIDs(tags) {
+		let visibleVideoIDs = this.props.videoIDs;
+		if (!visibleVideoIDs) return tags;
+
+		visibleVideoIDs = new Set(visibleVideoIDs);
+		let filteredTags = [];
+		tags.forEach(tag => {
+			let videoIDs = tag.videoIDs.filter(visibleVideoIDs.has, visibleVideoIDs);
+			if (videoIDs.length === 0) return;
+			tag.videoIDs = videoIDs
+			filteredTags.push(tag);
+		});
+		return filteredTags;
 	}
 
-	show() {
+	filterByValue(tags) {
+		let value = this.state.value;
+		if (value.trim() === "") {
+			return tags;
+		}
+		let keyword = value.toLowerCase();
+		return tags.filter(tag => tag.name.toLowerCase().includes(keyword) || tag.pinyin.includes(keyword));
+	}
+
+	getHints() {
+		if (this.state.frozenHints) return this.state.frozenHints;
+		let hints = JSON.parse(JSON.stringify(this.state.allTags));
+		hints = this.filterByValue(hints);
+		hints = this.filterByVideoIDs(hints);
+		hints = hints.sort((a, b) => b.videoIDs.length - a.videoIDs.length);
+		return hints;
+	}
+
+	handleTKeyDown(event) {
+		if (this.state.visible) return;
+		event.preventDefault();
 		this.setState({
-			tags: this.sortTags(this.state.allTags.slice()),
 			visible: true,
 			selectedIndex: null,
-			value: ""
+			value: "",
+			frozenHints: null
 		});
 	}
 
-	dismiss() {
+	handleEscapeKeyDown() {
+		if (!this.state.visible) return;
 		this.setState({visible: false})
+	}
+
+	handleEnterKeyDown(event) {
+		if (!this.state.visible) return;
+		event.preventDefault();
+		this.props.handleAddNewTag(this.state.value);
+		this.setState({visible: false})
+	}
+
+	handleArrowLeftKeyDown(event) {
+		if (!this.state.visible) return;
+		let selectedIndex = this.state.selectedIndex;
+		// Down key is not pressed (i.e. no hint is selected) yet, do nothing
+		if (selectedIndex === null) return;
+		
+		// It's already left most, do nothing
+		if (selectedIndex === 0) return;
+
+		event.preventDefault();
+		this.selectNewIndex(selectedIndex - 1, this.getHints());
+	}
+
+	handleArrowRightKeyDown(event) {
+		if (!this.state.visible) return;
+		let selectedIndex = this.state.selectedIndex;
+		// Down key is not pressed (i.e. no hint is selected) yet, do nothing
+		if (selectedIndex === null) return;
+		
+		let hints = this.getHints();
+		// It's already right most, do nothing
+		if (selectedIndex === hints.length - 1) return;
+
+		event.preventDefault();
+		this.selectNewIndex(selectedIndex + 1, hints);
+	}
+
+	selectNewIndex(newIndex, hints) {
+		this.setState({
+			selectedIndex: newIndex,
+			value: hints[newIndex].name,
+		});
+	}
+
+	handleArrowDownKeyDown(event) {
+		if (!this.state.visible) return;
+		let selectedIndex = this.state.selectedIndex;
+		// There is already a hint selected, do nothing
+		if (selectedIndex !== null) return;
+
+		let hints = this.getHints();
+		// No visible hints, do nothing
+		if (hints.length === 0) return;
+
+		event.preventDefault();
+		this.setState({
+			selectedIndex: 0,
+			value: hints[0].name,
+			frozenHints: hints
+		});
 	}
 
 	handleChange(event) {
 		let value = event.target.value;
-		let tags;
-		if (value.trim() === "") {
-			tags = this.state.allTags.slice();
-		}
-		else {
-			let keyword = value.toLowerCase();
-			tags = this.state.allTags.filter(tag => tag.name.toLowerCase().includes(keyword) || tag.pinyin.includes(keyword));
-		}
 		this.setState({
-			tags: this.sortTags(tags),
 			selectedIndex: null,
-			value: value
+			value: value,
+			frozenHints: null
 		})
 	}
 
 	handleGlobalKeyDown(event) {
-		let selectedIndex = this.state.selectedIndex;
-		let nextIndex;
-		if (event.key === 't') {
-			if (this.state.visible) return;
-			event.preventDefault();
-			this.show();
-			return;
-		}
-
-		if (!this.state.visible) return;
-		if (event.key === 'Escape') {
-			this.dismiss();
-			return;
-		}
-		else if (event.key === 'Enter') {
-			event.preventDefault();
-			this.props.handleAddNewTag(this.state.value);
-			this.dismiss();
-			return;
-		}
-
-		if (this.state.tags.length === 0) return;
-		if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
-			event.preventDefault();
-			if (selectedIndex === 0) {
-				nextIndex = 0;
-			}
-			else if (selectedIndex === null) {
-				nextIndex = this.state.tags.length - 1;
-			}
-			else {
-				nextIndex = selectedIndex - 1;
-			}
-		}
-		else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
-			event.preventDefault();
-			if (selectedIndex === this.state.tags.length - 1) {
-				nextIndex = selectedIndex;
-			}
-			else if (selectedIndex === null) {
-				nextIndex = 0;
-			}
-			else {
-				nextIndex = selectedIndex + 1;
-			}
-		}
-		if (nextIndex !== undefined) {
-			this.setState({
-				selectedIndex: nextIndex,
-				value: this.state.tags[nextIndex].name
-			})
-		}
-
+		if (event.key === 't') { this.handleTKeyDown(event); return; }
+		if (event.key === 'Escape') { this.handleEscapeKeyDown(event); return; }
+		if (event.key === 'Enter') { this.handleEnterKeyDown(event); return; }
+		if (event.key === 'ArrowLeft') { this.handleArrowLeftKeyDown(event); return; }
+		if (event.key === 'ArrowDown') { this.handleArrowDownKeyDown(event); return; }
+		if (event.key === 'ArrowRight') { this.handleArrowRightKeyDown(event); return; }
 	}
 
 	componentDidMount() {
-		this._listener = this.handleGlobalKeyDown.bind(this);
-		document.addEventListener("keydown", this._listener);
+		document.addEventListener("keydown", this.handleGlobalKeyDown);
 	}
 
 	componentWillUnmount() {
-		document.removeEventListener("keydown", this._listener);
+		document.removeEventListener("keydown", this.handleGlobalKeyDown);
 	}
 
 	handleTagClick(tag) {
@@ -126,19 +158,19 @@ export default class AddNewTag extends React.Component {
 
 	render() {
 		if (!this.state.visible) return null;
-		let tagDOMs = this.state.tags.map((tag, index) => 
+		let hintDOMs = this.getHints().map((tag, index) => 
 			<Tag selected={index === this.state.selectedIndex} tag={tag} key={tag.name} handleClick={this.handleTagClick} />);
-		let tagsDOM = tagDOMs.length > 0 ? <ul>{tagDOMs}</ul> : null;
+		let hintsDOM = hintDOMs.length > 0 ? <ul>{hintDOMs}</ul> : null;
 		return (
 			<div className="add-new-tag">
 				<input 
 					type="text" 
 					autoFocus={true} 
-					className={tagsDOM ? "has-hint" : null} 
+					className={hintsDOM ? "has-hint" : null} 
 					onChange={e => this.handleChange(e)}
 					value={this.state.value}
 					/>
-				{tagsDOM}
+				{hintsDOM}
 			</div>
 		)
 	}

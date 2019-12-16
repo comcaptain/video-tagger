@@ -10,7 +10,7 @@ export default function Tag(props) {
 	}
 	else {
 		tagName = tag.name;
-		videoCount = `(${tag.videoCount})`;
+		videoCount = `(${tag.videoIDs.length})`;
 	}
 	let classNames = ["video-tag"];
 	if (props.handleRemoveTag) classNames.push("removable");

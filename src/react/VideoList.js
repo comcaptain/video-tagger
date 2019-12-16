@@ -45,6 +45,7 @@ export default class VideoList extends React.Component {
 		}
 		let thumbnailStyle = {width: `calc(${100 / this.state.screenshotsPerLine}% - 1px)`}
 		let videoDOMs = videos.map(video => <Video {...video} key={video.path} thumbnailStyle={thumbnailStyle} />);
+		let videoIDs = videos.map(v => v.id);
 		return (<div>
 			<Navigation name="list" />
 			<div id="video-list">
@@ -53,7 +54,7 @@ export default class VideoList extends React.Component {
 					id="screenshots-per-line" 
 					onChange={this.updateScreenshotsPerLine} 
 					value={this.state.screenshotsPerLine} />
-				<Tags tags={this.state.tagNames} handleAddNewTag={this.handleAddNewTag} handleRemoveTag={this.handleRemoveTag} />
+				<Tags tags={this.state.tagNames} videoIDs={videoIDs} handleAddNewTag={this.handleAddNewTag} handleRemoveTag={this.handleRemoveTag} />
 				{videoDOMs}
 			</div>
 		</div>)

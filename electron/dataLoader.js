@@ -25,7 +25,7 @@ class DataPersister {
         		id: tagID,
         		name: tagName,
         		pinyin: nameInPinyin,
-        		videoCount: group.video_ids.length
+        		videoIDs: group.video_ids.map(v => v.toString())
         	}
         });
 	}
@@ -55,6 +55,7 @@ class DataPersister {
         let videos = await db.collection("Video").find({}).project({path: 1}).toArray();
 		console.log(`Loaded ${videos.length} videos`);
 		return videos.map(v => ({
+			id: v._id.toString(),
 			path: v.path,
 			screenshots: videoIDToScreenshots[v._id],
 		}));
