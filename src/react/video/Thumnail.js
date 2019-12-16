@@ -14,7 +14,7 @@ export default class Thumnail extends React.Component {
 			<img 
 				className="thumnail" 
 				onDoubleClick={this.handleDoubleClick.bind(this)}
-				src={this.props.screenshotPath} 
+				src={this.props.screenshotPath.replace("#", "%23")} 
 				alt={this.props.screenshotPath}
 				style={this.props.thumbnailStyle}
 				/>

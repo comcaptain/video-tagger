@@ -67,7 +67,7 @@ export default class CreateNewScreenshot extends React.Component {
 				</div>
 				<img 
 					id="video-screenshot"
-					src={"file:///" + this.state.screenshotFilePath}
+					src={"file:///" + this.state.screenshotFilePath.replace("#", "%23")}
 					alt={this.state.screenshotFilePath}/>
 			</div>
 		)
