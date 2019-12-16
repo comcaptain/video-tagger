@@ -40,13 +40,14 @@ module.exports = class TakeScreenshotListener {
 	}
 
 	watchForNewScreenshot() {
+		let startTime = new Date().getTime();
 		return new Promise((resolve, reject) => {
 			let timeoutID;
 			let watcher = fs.watch(conf.potplayer_screenshot_directory, (eventType, filename) => {
 				if (!filename) return;
 				clearTimeout(timeoutID);
 				watcher.close();
-				console.info("Screnshot is taken", filename);
+				console.info(`Screnshot ${filename} is taken in ${new Date().getTime() - startTime} ms`);
 				resolve(filename);
 			});
 			console.log(`Wait ${conf.wait_for_screenshot_delay} milliseconds for screenshot to be taken`)
