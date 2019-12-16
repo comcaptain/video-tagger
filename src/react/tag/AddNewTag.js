@@ -62,14 +62,19 @@ export default class AddNewTag extends React.Component {
 			if (this.state.visible) return;
 			event.preventDefault();
 			this.show();
+			return;
 		}
-		else if (event.key === 'Escape') {
+
+		if (!this.state.visible) return;
+		if (event.key === 'Escape') {
 			this.dismiss();
+			return;
 		}
 		else if (event.key === 'Enter') {
 			event.preventDefault();
 			this.props.handleAddNewTag(this.state.value);
 			this.dismiss();
+			return;
 		}
 
 		if (this.state.tags.length === 0) return;

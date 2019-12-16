@@ -8,9 +8,10 @@ const IPCInvoker = require('./ipc/IPCInvoker.js');
 export default class VideoList extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {videos: [], tagNames: []};
+		this.state = {videos: [], tagNames: [], screenshotsPerLine: 4};
 		this.handleAddNewTag = this.handleAddNewTag.bind(this);
 		this.handleRemoveTag = this.handleRemoveTag.bind(this);
+		this.updateScreenshotsPerLine = this.updateScreenshotsPerLine.bind(this);
 		new IPCInvoker("dataLoader").invoke("loadAllVideos").then(v => this.setState({videos: v.reverse()}));
 	}
 
@@ -26,6 +27,12 @@ export default class VideoList extends React.Component {
 		})
 	}
 
+	updateScreenshotsPerLine(event) {
+		this.setState({
+			screenshotsPerLine: event.target.value
+		})
+	}
+
 	render() {
 		let videos = this.state.videos;
 		let tagNames = this.state.tagNames;
@@ -36,11 +43,16 @@ export default class VideoList extends React.Component {
 				return tagNames.every(videoTagNames.has, videoTagNames);
 			});
 		}
-		let videoDOMs = videos.map(video => <Video {...video} key={video.path} />);
+		let thumbnailStyle = {width: `calc(${100 / this.state.screenshotsPerLine}% - 1px)`}
+		let videoDOMs = videos.map(video => <Video {...video} key={video.path} thumbnailStyle={thumbnailStyle} />);
 		return (<div>
 			<Navigation name="list" />
 			<div id="video-list">
 				{videos.length}个视频
+				<input type="number" 
+					id="screenshots-per-line" 
+					onChange={this.updateScreenshotsPerLine} 
+					value={this.state.screenshotsPerLine} />
 				<Tags tags={this.state.tagNames} handleAddNewTag={this.handleAddNewTag} handleRemoveTag={this.handleRemoveTag} />
 				{videoDOMs}
 			</div>
