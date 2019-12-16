@@ -59,6 +59,7 @@ export default class AddNewTag extends React.Component {
 		let selectedIndex = this.state.selectedIndex;
 		let nextIndex;
 		if (event.key === 't') {
+			if (this.state.visible) return;
 			event.preventDefault();
 			this.show();
 		}
