@@ -5,6 +5,7 @@ $add-new-tag-width: 1000px;
     top: calc(50% - 350px);
     left: calc(50% - #{$add-new-tag-width / 2});
     width: $add-new-tag-width;
+    z-index: 1;
 
     input[type=text] {
 		width: 100%;
