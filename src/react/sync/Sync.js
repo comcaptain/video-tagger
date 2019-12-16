@@ -3,6 +3,9 @@ import Navigation from "../navigation/Navigation";
 import IndexedVideos from "./IndexedVideos"
 import './Sync.css'
 import '../styles/buttons.scss'
+const fs = require("fs");
+const util = require("util");
+const fsDelete = util.promisify(fs.unlink);
 const dialog = require('electron').remote.dialog;
 const VideoScanner = require('./VideoScanner.js');
 const IPCInvoker = require('../ipc/IPCInvoker.js');
@@ -49,13 +52,29 @@ export default class Sync extends React.Component {
 		});
 	}
 
+	handleVideoClick(event, videoPath) {
+		if (event.ctrlKey) {			
+			if (!window.confirm(`Are you sure to delete video ${videoPath}?`)) return;
+			fsDelete(videoPath)
+				.then(() => window.alert("Successfully deleted file " + videoPath))
+				.catch(e => {
+					console.error(e);
+					window.alert(`Failed to delete file ${videoPath} because of ${e}`)
+				});
+		}
+		else {
+			new VideoPlayer(videoPath).play()
+		}
+	}
+
 	dirSelected() {
 		return this.state.directories.length > 0;
 	}
 
 	render() {
 		let diretoryDOMs = this.state.directories.map(v => <li key={v}>{v}</li>);
-		let notIndexedVideoDOMs = this.state.notIndexedVideos.map(v => <li key={v} onClick={() => new VideoPlayer(v).play()}>{v}</li>);
+		let notIndexedVideoDOMs = this.state.notIndexedVideos
+			.map(v => <li key={v} onClick={(event) => this.handleVideoClick(event, v)}>{v}</li>);
 		return (<div>
 			<Navigation name="sync" />
 			<div id="sync">
