@@ -81,6 +81,8 @@ ${msToTime(new Date().getTime() - this._startTime)} ${statuses.join(' ')}`;
 					// Not indexed file found
 					this._notIndexedVideoPaths.push(fullPath);
 					this.updateStatus("Not indexed file found", fullPath);
+				}).catch(e => {
+					console.error(`Cannot calculate fingerprint of ${fullPath} because of ${e}`);
 				})
 			})
 		}))).then(() => this._scannedDirectoryCount++)
@@ -92,6 +94,9 @@ ${msToTime(new Date().getTime() - this._startTime)} ${statuses.join(' ')}`;
 
 		return fsStat(fullPath).then(stats => {
 			return stats.mtime.getTime() !== storedMTime.getTime();
+		}).catch(e => {
+			console.error(`Cannot visit file ${fullPath} because of ${e}`);
+			return false;
 		})
 	}
 }
