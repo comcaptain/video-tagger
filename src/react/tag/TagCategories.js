@@ -10,7 +10,7 @@ export default class TagCategories extends React.Component {
 		this.state = {
 			tags: []
 		};
-		new IPCInvoker("dataLoader").invoke("loadAllTags").then(tags => this.setState({tags: tags}));	
+		new IPCInvoker("dataLoader").invoke("loadAllTags").then(tags => this.setState({tags: tags.sort((a, b) => b.videoIDs.length - a.videoIDs.length)}));	
 	}
 
 	render() {
