@@ -1,4 +1,8 @@
 #tag-categories {
 	width: calc(100% - 100px);
 	margin: 20px auto 0 auto;
+
+	&.dragging .tag-category * {
+		pointer-events: none;
+	}
 }

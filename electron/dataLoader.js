@@ -18,7 +18,7 @@ class DataPersister {
         ).toArray();
         console.info("Loaded")
         return groups.map(group => {
-        	let tagID = group._id;
+        	let tagID = group._id.toString();
         	let tagName = tagIDToNameMap[tagID];
         	let nameInPinyin = pinyin(tagName, {removeTone: true, removeSpace: true});
         	return {

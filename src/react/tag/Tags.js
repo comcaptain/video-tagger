@@ -4,8 +4,14 @@ import Tag from './Tag';
 import './Tags.css';
 
 export default function Tags(props) {
-	let tagsDOM = props.tags.map(tag => 
-		<Tag handleRemoveTag={props.handleRemoveTag} tag={tag} key={typeof tag === "string" ? tag : tag.name} />);
+	let tagsDOM = props.tags.map(tag => (<Tag 
+		handleRemoveTag={props.handleRemoveTag}
+		dropTagEffect={props.dropTagEffect} 
+		tag={tag} 
+		handleDragTagStart={props.handleDragTagStart}
+		handleDragTagEnd={props.handleDragTagEnd}
+		key={typeof tag === "string" ? tag : tag.name} />
+	));
 	return (
 		<div className="video-tags">
 			<ul>{tagsDOM}</ul>

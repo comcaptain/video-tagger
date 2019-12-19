@@ -7,6 +7,10 @@
 	position: relative;
 	min-height: 50px;
 
+	&.dragging-over {
+		border: 1px solid green;
+	}
+
 	.tag-category-name {
 		position: absolute;
 		top: -12px;
