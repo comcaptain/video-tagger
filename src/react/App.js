@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import CreateNewScreenshot from './CreateNewScreenshot';
 import VideoList from './VideoList'
+import TagCategories from './tag/TagCategories'
 import Sync from './sync/Sync'
 
 export default function App() {
@@ -17,6 +18,9 @@ export default function App() {
 				</Route>
 				<Route path="/sync">
 					<Sync />
+				</Route>
+				<Route path="/tags">
+					<TagCategories />
 				</Route>
 				<Route path="/">
 					<VideoList />

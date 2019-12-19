@@ -1,0 +1,20 @@
+.tag-category {
+	border: 1px dashed silver;
+	border-radius: 10px;
+	padding: 5px;
+	margin-top: 20px;
+	padding-right: 3px;
+	position: relative;
+	min-height: 50px;
+
+	.tag-category-name {
+		position: absolute;
+		top: -12px;
+		background: white;
+		padding: 0 3px;
+	}
+
+	.video-tag {
+		margin-top: 5px;
+	}
+}

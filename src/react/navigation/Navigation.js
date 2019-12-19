@@ -5,6 +5,7 @@ const ReactWindow = require("electron").remote.require('./ReactWindow.js');
 const ROUTES = [
 	{name: "list", url: "/", description: "视频列表"},
 	{name: "sync", url: "/sync", description: "视频文件同步"},
+	{name: "tags", url: "/tags", description: "标签分类"},
 ]
 
 export default class Navigation extends React.PureComponent {
