@@ -8,9 +8,14 @@ class DataPersister {
 	}
 
 	async loadAllTags() {
-		let tagIDToNameMap = await this.loadTagIDToNameMap();
-		console.info("Loading video count per tag...")
+		console.info("Loading tags...")
 		let db = await this._dbPromise;
+		let tags = await db.collection("Tag").find({}).project({name: 1, type: 1}).toArray();
+		console.log(`Loaded, found ${tags.length} tags`)
+		let tagIDToTagMap = {};
+		tags.forEach(tag => tagIDToTagMap[tag._id] = tag);
+
+		console.info("Loading video count per tag...")
 		let groups = await db.collection("TagPoint").aggregate( 
             [
                 {"$group": { "_id": "$tag_id", video_ids: {$addToSet: "$video_id"} } }
@@ -19,11 +24,12 @@ class DataPersister {
         console.info("Loaded")
         return groups.map(group => {
         	let tagID = group._id.toString();
-        	let tagName = tagIDToNameMap[tagID];
-        	let nameInPinyin = pinyin(tagName, {removeTone: true, removeSpace: true});
+        	let tag = tagIDToTagMap[tagID];
+        	let nameInPinyin = pinyin(tag.name, {removeTone: true, removeSpace: true});
         	return {
         		id: tagID,
-        		name: tagName,
+        		name: tag.name,
+        		type: tag.type,
         		pinyin: nameInPinyin,
         		videoIDs: group.video_ids.map(v => v.toString())
         	}
