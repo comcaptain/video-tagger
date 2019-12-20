@@ -2,6 +2,7 @@ import React from 'react'
 import TagCategory from './TagCategory'
 import Navigation from "../navigation/Navigation";
 import './TagCategories.scss'
+import '../styles/buttons.scss'
 const IPCInvoker = require('../ipc/IPCInvoker.js');
 
 const CATEGORIES = [{name: "一级目录"}, {name: "二级目录"}, {name: "文件名"}, {name: "其它", isDefault: true}]
@@ -11,12 +12,17 @@ export default class TagCategories extends React.Component {
 		super(props);
 		this.state = {
 			tags: [],
-			dragging: false
+			dragging: false,
+			savingTagTypes: false
 		};
 		this.handleTypeChange = this.handleTypeChange.bind(this);
 		this.handleDragTagStart = this.handleDragTagStart.bind(this);
 		this.handleDragTagEnd = this.handleDragTagEnd.bind(this);
-		new IPCInvoker("dataLoader").invoke("loadAllTags")
+		this.reloadTags();
+	}
+
+	reloadTags() {
+		return new IPCInvoker("dataLoader").invoke("loadAllTags")
 			.then(tags => this.setState({tags: tags.sort((a, b) => b.videoIDs.length - a.videoIDs.length)}));	
 	}
 
@@ -35,6 +41,14 @@ export default class TagCategories extends React.Component {
 		this.setState({dragging: false});
 	}
 
+	saveTagTypes() {
+		if (!window.confirm("确定要保存标签分类吗？")) return;
+		this.setState({savingTagTypes: true});
+		new IPCInvoker("dataPersister").invoke("updateTagTypes", this.state.tags)
+			.then(() => this.reloadTags())
+			.then(() => this.setState({savingTagTypes: false}));
+	}
+
 	render() {
 		const categories = CATEGORIES.map(category => (<TagCategory 
 			tags={this.state.tags}
@@ -47,7 +61,15 @@ export default class TagCategories extends React.Component {
 		/>));
 		return (<div>
 			<Navigation />
-			<div id="tag-categories" className={this.state.dragging ? "dragging" : null}>{categories}</div>
+			<div id="tag-categories" className={this.state.dragging ? "dragging" : null}>
+				{categories}
+				<div id="buttons">
+					<button 
+						disabled={this.state.savingTagTypes} 
+						className="action-button green" 
+						onClick={this.saveTagTypes.bind(this)}>保存标签分类</button>
+				</div>
+			</div>
 		</div>)
 	}
 }

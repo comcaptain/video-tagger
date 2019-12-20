@@ -1,4 +1,4 @@
-const MongoClient = require('mongodb').MongoClient;
+const {MongoClient, ObjectID} = require('mongodb');
 const conf = require('../src/share/conf.js');
 const fs = require("fs");
 const path = require('path');
@@ -10,6 +10,22 @@ const FingerprintCalculator = require("../src/share/FingerprintCalculator.js");
 class DataPersister {
 	constructor() {
 		this._dbPromise = new MongoClient(conf.mongo_db_url, {useUnifiedTopology: true}).connect().then(client => client.db(conf.mongo_db_name));
+	}
+
+	async updateTagTypes(newTags) {
+		let db = await this._dbPromise;
+		let tagIDToType = {};
+		let tags = await db.collection("Tag").find({}).project({type: 1}).toArray();
+		tags.forEach(tag => tagIDToType[tag._id] = tag.type)
+		const bulkOperations = db.collection("Tag").initializeUnorderedBulkOp();
+		newTags.forEach(newTag => {
+			let oldType = tagIDToType[newTag.id];
+			if (newTag.type === oldType) return;
+			console.info(`Update type of ${newTag.name} from ${oldType} to ${newTag.type}`);
+			bulkOperations.find({_id: new ObjectID(newTag.id)}).updateOne({$set: {type: newTag.type}});
+		})
+		let updateResult = await bulkOperations.execute();
+		console.info(`Updated ${bulkOperations.length} tags' type:`, updateResult);
 	}
 
 	async persist(screenshot, tagNames) {
