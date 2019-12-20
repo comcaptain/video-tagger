@@ -49,7 +49,7 @@
     "test": "rescripts test",
     "eject": "react-scripts eject",
     "electron-dev": "concurrently \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
-    "electron": "electron .",
+    "electron": "electron --inspect=5858 .",
     "dev-server": "cross-env BROWSER=none yarn start",
     "postinstall": "electron-builder install-app-deps",
     "preelectron-pack": "yarn build",
