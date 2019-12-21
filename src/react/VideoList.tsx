@@ -3,33 +3,45 @@ import Video from './video/Video'
 import Tags from './tag/Tags'
 import Navigation from './navigation/Navigation'
 import './VideoList.css';
-const IPCInvoker = require('./ipc/IPCInvoker');
+import { VideoWithScreenshots } from '../share/bean/Video';
+import { TagName } from '../share/bean/Tag';
+import IPCInvoker from './ipc/IPCInvoker';
 
-export default class VideoList extends React.Component {
-	constructor(props) {
+interface Props {
+
+}
+
+interface State {
+	videos: VideoWithScreenshots[];
+	tagNames: TagName[];
+	screenshotsPerLine: number;
+}
+
+export default class VideoList extends React.Component<Props, State> {
+	constructor(props: Props) {
 		super(props);
 		this.state = {videos: [], tagNames: [], screenshotsPerLine: 4};
 		this.handleAddNewTag = this.handleAddNewTag.bind(this);
 		this.handleRemoveTag = this.handleRemoveTag.bind(this);
 		this.updateScreenshotsPerLine = this.updateScreenshotsPerLine.bind(this);
-		new IPCInvoker("dataLoader").invoke("loadAllVideos").then(v => this.setState({videos: v.reverse()}));
+		new IPCInvoker("dataLoader").invoke("loadAllVideos").then((v: VideoWithScreenshots[]) => this.setState({videos: v.reverse()}));
 	}
 
-	handleAddNewTag(newTagName) {
+	handleAddNewTag(newTagName: TagName) {
 		this.setState({
 			tagNames: this.state.tagNames.concat([newTagName])
 		})
 	}
 
-	handleRemoveTag(tagName) {
+	handleRemoveTag(tagName: TagName) {
 		this.setState({
 			tagNames: this.state.tagNames.filter(v => v !== tagName)
 		})
 	}
 
-	updateScreenshotsPerLine(event) {
+	updateScreenshotsPerLine(event: React.ChangeEvent<HTMLInputElement>) {
 		this.setState({
-			screenshotsPerLine: event.target.value
+			screenshotsPerLine: parseInt(event.target.value)
 		})
 	}
 
@@ -54,7 +66,7 @@ export default class VideoList extends React.Component {
 					id="screenshots-per-line" 
 					onChange={this.updateScreenshotsPerLine} 
 					value={this.state.screenshotsPerLine} />
-				<Tags tags={this.state.tagNames} videoIDs={videoIDs} handleAddNewTag={this.handleAddNewTag} handleRemoveTag={this.handleRemoveTag} />
+				<Tags tags={this.state.tagNames.map(v => ({name: v}))} videoIDs={videoIDs} handleAddNewTag={this.handleAddNewTag} handleRemoveTag={this.handleRemoveTag} />
 				{videoDOMs}
 			</div>
 		</div>)

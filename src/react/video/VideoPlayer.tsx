@@ -1,10 +1,9 @@
-const { exec } = require('child_process');
+import { exec } from 'child_process';
+import { VideoPath } from '../../share/bean/Video';
+import { SeekPosition } from '../../share/bean/Screenshot';
 
-module.exports = class VideoPlayer {
-	constructor(path, seekPosition) {
-		this._path = path;
-		this._seekPosition = seekPosition;
-	}
+export default class VideoPlayer {
+	constructor(private _path: VideoPath, private _seekPosition?: SeekPosition) {}
 
 	play() {
 		let openCommand = `"C:\\Program Files\\DAUM\\PotPlayer\\PotPlayerMini64.exe" "${this._path}"`;

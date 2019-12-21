@@ -1,17 +1,28 @@
 import React from 'react';
 import './Tag.scss';
+import { TagWithVideoIDs, TagName, EmptyTag } from '../../share/bean/Tag';
 
-export default class Tag extends React.Component {
+interface Props {
+	dropTagEffect?: string;
+	tag: TagWithVideoIDs | EmptyTag;
+	handleDragTagStart?: ((e: React.DragEvent) => any);
+	handleDragTagEnd?: ((e: React.DragEvent) => any);
+	handleRemoveTag?: ((name: TagName) => any);
+	selected?: boolean;
+	handleClick?: ((tag: TagWithVideoIDs | EmptyTag) => any);
+}
 
-	constructor(props) {
+export default class Tag extends React.Component<Props> {
+
+	constructor(props: Props) {
 		super(props);
 		this.handleDragStart = this.handleDragStart.bind(this);
 	}
 
-	handleDragStart(event) {
-		event.dataTransfer.setData("tag", JSON.stringify(this.props.tag));
-		event.dataTransfer.dropEffect = this.props.dropTagEffect;
-		this.props.handleDragTagStart(event);
+	handleDragStart(event: React.DragEvent) {
+		event.dataTransfer!.setData("tag", JSON.stringify(this.props.tag));
+		event.dataTransfer!.dropEffect = this.props.dropTagEffect!;
+		this.props.handleDragTagStart!(event);
 	}
 
 	getClassName() {
@@ -29,24 +40,17 @@ export default class Tag extends React.Component {
 
 	render() {		
 		let tag = this.props.tag;
-		let tagName, videoCount;
-		if (typeof tag === 'string') {
-			tagName = tag;
-			videoCount = "";
-		}
-		else {
-			tagName = tag.name;
-			videoCount = `(${tag.videoIDs.length})`;
-		}
+		let tagName = tag.name
+		let videoCount = (tag as TagWithVideoIDs).videoIDs ?  `(${(tag as TagWithVideoIDs).videoIDs.length})` : "";
 		return (
 			<li className={this.getClassName()} 
 				onDragStart={this.handleDragStart} 
 				onDragEnd={this.props.handleDragTagEnd} 
 				draggable={this.isDraggable()}>
-				<span onClick={this.props.handleClick ? () => this.props.handleClick(tag) : null}>{tagName}{videoCount}</span>
+				<span onClick={this.props.handleClick ? () => this.props.handleClick!(tag) : undefined}>{tagName}{videoCount}</span>
 				{this.props.handleRemoveTag && (<button 
 					className="remove-tag" 
-					onClick={e => this.props.handleRemoveTag(tagName)}>x</button>)
+					onClick={e => this.props.handleRemoveTag!(tagName)}>x</button>)
 				}
 			</li>
 		)

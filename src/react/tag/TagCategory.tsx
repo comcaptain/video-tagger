@@ -1,10 +1,24 @@
 import React from 'react'
 import Tags from './Tags'
 import './TagCategory.scss'
+import { TagType, TagWithVideoIDs } from '../../share/bean/Tag';
 
-export default class TagCategory extends React.Component {
+interface Props {
+	isDefault?: boolean;
+	name: TagType;
+	tags: TagWithVideoIDs[];
+	handleTypeChange: (tag: TagWithVideoIDs, type: TagType) => any;
+	handleDragTagStart: (event: React.DragEvent) => any;
+	handleDragTagEnd: (event: React.DragEvent) => any;
+}
 
-	constructor(props) {
+interface State {
+	draggingOver: boolean;
+}
+
+export default class TagCategory extends React.Component<Props, State> {
+
+	constructor(props: Props) {
 		super(props);
 		this.handleDragOver = this.handleDragOver.bind(this);
 		this.handleDrop = this.handleDrop.bind(this);
@@ -15,24 +29,24 @@ export default class TagCategory extends React.Component {
 		}
 	}
 
-	handleDragEnter(event) {
+	handleDragEnter() {
 		this.setState({
 			draggingOver: true
 		})
 	}
 
-	handleDragLeave(event) {
+	handleDragLeave() {
 		this.setState({
 			draggingOver: false
 		})
 	}
 
-	handleDragOver(event) {
+	handleDragOver(event: React.DragEvent) {
 		event.preventDefault();
 		event.dataTransfer.dropEffect = "move";
 	}
 
-	handleDrop(event) {
+	handleDrop(event: React.DragEvent) {
 		event.preventDefault();
 		this.setState({
 			draggingOver: false

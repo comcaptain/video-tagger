@@ -1,19 +1,34 @@
+import * as Video from '../../share/bean/Video'
 import React from "react";
 import Navigation from "../navigation/Navigation";
 import IndexedVideos from "./IndexedVideos"
 import './Sync.css'
 import '../styles/buttons.scss'
-const fs = require("fs");
-const util = require("util");
+import fs from "fs";
+import util from "util";
+import {remote} from 'electron';
+import VideoScanner from './VideoScanner';
+import IPCInvoker from '../ipc/IPCInvoker';
+import VideoPlayer from '../video/VideoPlayer';
 const fsDelete = util.promisify(fs.unlink);
-const dialog = require('electron').remote.dialog;
-const VideoScanner = require('./VideoScanner');
-const IPCInvoker = require('../ipc/IPCInvoker');
-const VideoPlayer = require('../video/VideoPlayer');
+const dialog = remote.dialog;
 
-export default class Sync extends React.Component {
+interface Props {
 
-	constructor(props) {
+}
+
+type SyncDirectory = string;
+
+interface State {
+	directories: SyncDirectory[],
+	status: string | null,
+	scanning: boolean,
+	notIndexedVideos: Video.VideoPath[]
+}
+
+export default class Sync extends React.Component<Props, State> {
+
+	constructor(props: Props) {
 		super(props);
 		this.state = {
 			directories: [],
@@ -44,20 +59,20 @@ export default class Sync extends React.Component {
 		this.setState({status: `Loaded ${videos.length}`});
 		
 		// Scan
-		let scanner = new VideoScanner(new IndexedVideos(videos), this.state.directories, status => this.setState({status: status}));
+		let scanner = new VideoScanner(new IndexedVideos(videos), this.state.directories);
 		let timer = setInterval(() => this.setState({status: scanner.status}), 10);
-		scanner.scan().then(v => {
+		scanner.scan().then((v: Video.VideoPath[]) => {
 			this.setState({notIndexedVideos: v, scanning: false, status: scanner.status});
 			clearInterval(timer);
 		});
 	}
 
-	handleVideoClick(event, videoPath) {
+	handleVideoClick(event: React.MouseEvent, videoPath: Video.VideoPath) {
 		if (event.ctrlKey) {			
 			if (!window.confirm(`Are you sure to delete video ${videoPath}?`)) return;
 			fsDelete(videoPath)
 				.then(() => window.alert("Successfully deleted file " + videoPath))
-				.catch(e => {
+				.catch((e: any) => {
 					console.error(e);
 					window.alert(`Failed to delete file ${videoPath} because of ${e}`)
 				});

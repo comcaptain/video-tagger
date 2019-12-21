@@ -14,6 +14,7 @@
 ### Tag collection
 - uuid
 - name
+- type
 - description
 - create_time
 

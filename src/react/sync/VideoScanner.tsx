@@ -1,27 +1,33 @@
-const fs = require("fs")
-const path = require("path")
-const util = require('util');
+import fs from "fs"
+import path from "path"
+import util from 'util';
+import * as Video from '../../share/bean/Video';
+import IndexedVideos from './IndexedVideos';
+import FingerprintCalculator from '../../share/FingerprintCalculator';
+import IPCInvoker from '../ipc/IPCInvoker';
+
 const fsReadDir = util.promisify(fs.readdir);
 const fsStat = util.promisify(fs.stat);
-const FingerprintCalculator = require('../../share/FingerprintCalculator')
-const IPCInvoker = require('../ipc/IPCInvoker');
 const dataPersister = new IPCInvoker("dataPersister");
 
 const VIDEO_EXTENSIONS = new Set([".mp4", ".wmv", ".mkv", ".avi", ".rmvb", ".rm", ".flv", ".mov", ".3gp", ".VOB", ".MKV"]);
 
-module.exports = class VideoScanner {
-	constructor(indexedVideos, directories) {
-		this._indexedVideos = indexedVideos;
-		this._directories = directories;
-	}
+type ScanDirectory = string;
+
+export default class VideoScanner {
+
+	private _scannedDirectoryCount:number = 0;
+	private _scannedFileCount:number = 0;
+	private _scannedVideoFileCount:number = 0;
+	private _updatePathCount:number = 0;
+	private _notIndexedVideoPaths: Video.VideoPath[] = [];
+	private _startTime: Date = new Date();
+	public status: string = "";
+
+	constructor(private readonly _indexedVideos: IndexedVideos, private readonly _directories: ScanDirectory[]) {}
 
 	scan() {
-		this._scannedDirectoryCount = 0;
-		this._scannedFileCount = 0;
-		this._scannedVideoFileCount = 0;
-		this._updatePathCount = 0;
-		this._notIndexedVideoPaths = [];
-		this._startTime = new Date().getTime();
+		this._startTime = new Date();
 		this.updateStatus("Scan started");
 		return Promise.all(this._directories.map(this.scanDirectory, this)).then(() => {
 			this.updateStatus("Scan finished")
@@ -29,17 +35,17 @@ module.exports = class VideoScanner {
 		})
 	}
 
-	updateStatus(...statuses) {
+	updateStatus(...statuses: string[]) {
 		this.status = `Scanned ${this._scannedDirectoryCount} directories, \
 ${this._scannedFileCount} files, \
 ${this._scannedVideoFileCount} videos; \
 updated paths for ${this._updatePathCount} videos; \
 found ${this._notIndexedVideoPaths.length} not indexed videos
-${msToTime(new Date().getTime() - this._startTime)} ${statuses.join(' ')}`;
+${msToTime(new Date().getTime() - this._startTime.getTime())} ${statuses.join(' ')}`;
 		console.info(this.status);
 	}
 
-	scanDirectory(directory) {
+	scanDirectory(directory: ScanDirectory): Promise<any> {
 		this.updateStatus("Scanning directory", directory);
 		return fsReadDir(directory, {withFileTypes: true}).then(files => Promise.all(files.map(file => {
 			let fullPath = path.join(directory, file.name);
@@ -88,7 +94,7 @@ ${msToTime(new Date().getTime() - this._startTime)} ${statuses.join(' ')}`;
 		}))).then(() => this._scannedDirectoryCount++)
 	}
 
-	isFileChanged(fullPath) {
+	isFileChanged(fullPath: string): Promise<boolean> {
 		let storedMTime = this._indexedVideos.getModifiedTime(fullPath);
 		if (storedMTime === undefined) return Promise.resolve(true);
 
@@ -101,15 +107,11 @@ ${msToTime(new Date().getTime() - this._startTime)} ${statuses.join(' ')}`;
 	}
 }
 
-function msToTime(duration) {
-	let milliseconds = parseInt((duration % 1000) / 100),
+function msToTime(duration: number): string {
+	let milliseconds = Math.floor((duration % 1000) / 100),
 		seconds = Math.floor((duration / 1000) % 60),
 		minutes = Math.floor((duration / (1000 * 60)) % 60),
 		hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
 
-	hours = (hours < 10) ? "0" + hours : hours;
-	minutes = (minutes < 10) ? "0" + minutes : minutes;
-	seconds = (seconds < 10) ? "0" + seconds : seconds;
-
-	return hours + ":" + minutes + ":" + seconds + "." + milliseconds;
+	return `${(hours < 10) ? "0" + hours : hours}:${(minutes < 10) ? "0" + minutes : minutes}:${(seconds < 10) ? "0" + seconds : seconds}.${milliseconds}`;
 }

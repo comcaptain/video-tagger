@@ -8,9 +8,13 @@ const ROUTES = [
 	{name: "tags", url: "/tags", description: "标签分类"},
 ]
 
-export default class Navigation extends React.PureComponent {
+interface Props {
+	name: string
+}
+
+export default class Navigation extends React.PureComponent<Props> {
 	
-	handleClick(event, url) {
+	handleClick(event: React.MouseEvent, url: string) {
 		if (event.ctrlKey) {
 			new ReactWindow(url, {maximize: true}).open();
 		}

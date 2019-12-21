@@ -1,11 +1,13 @@
-const { ipcRenderer } = require('electron')
+import { ipcRenderer } from 'electron'
 
-module.exports = class IPCInvoker {
-	constructor(name) {
+export default class IPCInvoker {
+	_name: string;
+
+	constructor(name: string) {
 		this._name = name;
 	}
 
-	invoke(functionName, ...parameters) {
+	invoke(functionName: string, ...parameters: any[]) {
 		let name = this._name;
 		console.log("Sending IPC invoke request for " + name + "...", functionName, parameters)
 		let promise = ipcRenderer.invoke(name, functionName, parameters).then(result => {

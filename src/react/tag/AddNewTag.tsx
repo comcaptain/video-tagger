@@ -1,10 +1,25 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import './AddNewTag.scss';
 import Tag from './Tag';
-const IPCInvoker = require('../ipc/IPCInvoker');
+import { VideoID } from '../../share/bean/Video';
+import { TagWithVideoIDs, TagName, EmptyTag } from '../../share/bean/Tag';
+import IPCInvoker from '../ipc/IPCInvoker';
 
-export default class AddNewTag extends React.Component {
-	constructor(props) {
+interface Props {
+	videoIDs?: VideoID[];
+	handleAddNewTag: (name: TagName) => any;
+}
+
+interface State {
+	visible: boolean;
+	allTags: TagWithVideoIDs[];
+	selectedIndex: number | null;
+	value: TagName;
+	frozenHints: TagWithVideoIDs[] | null;
+}
+
+export default class AddNewTag extends React.Component<Props, State> {
+	constructor(props: Props) {
 		super(props);
 		this.state = {
 			visible: false,
@@ -13,17 +28,16 @@ export default class AddNewTag extends React.Component {
 			value: "",
 			frozenHints: null
 		};
-		new IPCInvoker("dataLoader").invoke("loadAllTags").then(allTags => this.setState({allTags: allTags}));	
+		new IPCInvoker("dataLoader").invoke("loadAllTags").then((allTags: TagWithVideoIDs[]) => this.setState({allTags: allTags}));	
 		this.handleTagClick = this.handleTagClick.bind(this);
 		this.handleGlobalKeyDown = this.handleGlobalKeyDown.bind(this);
 	}
 
-	filterByVideoIDs(tags) {
-		let visibleVideoIDs = this.props.videoIDs;
-		if (!visibleVideoIDs) return tags;
+	filterByVideoIDs(tags: TagWithVideoIDs[]) {
+		if (!this.props.videoIDs) return tags;
 
-		visibleVideoIDs = new Set(visibleVideoIDs);
-		let filteredTags = [];
+		let visibleVideoIDs = new Set(this.props.videoIDs);
+		let filteredTags: TagWithVideoIDs[] = [];
 		tags.forEach(tag => {
 			let videoIDs = tag.videoIDs.filter(visibleVideoIDs.has, visibleVideoIDs);
 			if (videoIDs.length === 0) return;
@@ -33,7 +47,7 @@ export default class AddNewTag extends React.Component {
 		return filteredTags;
 	}
 
-	filterByValue(tags) {
+	filterByValue(tags: TagWithVideoIDs[]) {
 		let value = this.state.value;
 		if (value.trim() === "") {
 			return tags;
@@ -47,11 +61,11 @@ export default class AddNewTag extends React.Component {
 		let hints = JSON.parse(JSON.stringify(this.state.allTags));
 		hints = this.filterByValue(hints);
 		hints = this.filterByVideoIDs(hints);
-		hints = hints.sort((a, b) => b.videoIDs.length - a.videoIDs.length);
+		hints = hints.sort((a: TagWithVideoIDs, b:TagWithVideoIDs) => b.videoIDs.length - a.videoIDs.length);
 		return hints;
 	}
 
-	handleTKeyDown(event) {
+	handleTKeyDown(event: KeyboardEvent) {
 		if (this.state.visible) return;
 		event.preventDefault();
 		this.setState({
@@ -67,14 +81,14 @@ export default class AddNewTag extends React.Component {
 		this.setState({visible: false})
 	}
 
-	handleEnterKeyDown(event) {
+	handleEnterKeyDown(event: KeyboardEvent) {
 		if (!this.state.visible) return;
 		event.preventDefault();
 		this.props.handleAddNewTag(this.state.value);
 		this.setState({visible: false})
 	}
 
-	handleArrowLeftKeyDown(event) {
+	handleArrowLeftKeyDown(event: KeyboardEvent) {
 		if (!this.state.visible) return;
 		let selectedIndex = this.state.selectedIndex;
 		// Down key is not pressed (i.e. no hint is selected) yet, do nothing
@@ -87,7 +101,7 @@ export default class AddNewTag extends React.Component {
 		this.selectNewIndex(selectedIndex - 1, this.getHints());
 	}
 
-	handleArrowRightKeyDown(event) {
+	handleArrowRightKeyDown(event: KeyboardEvent) {
 		if (!this.state.visible) return;
 		let selectedIndex = this.state.selectedIndex;
 		// Down key is not pressed (i.e. no hint is selected) yet, do nothing
@@ -101,14 +115,14 @@ export default class AddNewTag extends React.Component {
 		this.selectNewIndex(selectedIndex + 1, hints);
 	}
 
-	selectNewIndex(newIndex, hints) {
+	selectNewIndex(newIndex: number, hints: TagWithVideoIDs[]) {
 		this.setState({
 			selectedIndex: newIndex,
 			value: hints[newIndex].name,
 		});
 	}
 
-	handleArrowDownKeyDown(event) {
+	handleArrowDownKeyDown(event: KeyboardEvent) {
 		if (!this.state.visible) return;
 		let selectedIndex = this.state.selectedIndex;
 		// There is already a hint selected, do nothing
@@ -126,7 +140,7 @@ export default class AddNewTag extends React.Component {
 		});
 	}
 
-	handleChange(event) {
+	handleChange(event: ChangeEvent<HTMLInputElement>) {
 		let value = event.target.value;
 		this.setState({
 			selectedIndex: null,
@@ -135,9 +149,9 @@ export default class AddNewTag extends React.Component {
 		})
 	}
 
-	handleGlobalKeyDown(event) {
+	handleGlobalKeyDown(event: KeyboardEvent) {
 		if (event.key === 't') { this.handleTKeyDown(event); return; }
-		if (event.key === 'Escape') { this.handleEscapeKeyDown(event); return; }
+		if (event.key === 'Escape') { this.handleEscapeKeyDown(); return; }
 		if (event.key === 'Enter') { this.handleEnterKeyDown(event); return; }
 		if (event.key === 'ArrowLeft') { this.handleArrowLeftKeyDown(event); return; }
 		if (event.key === 'ArrowDown') { this.handleArrowDownKeyDown(event); return; }
@@ -152,13 +166,13 @@ export default class AddNewTag extends React.Component {
 		document.removeEventListener("keydown", this.handleGlobalKeyDown);
 	}
 
-	handleTagClick(tag) {
+	handleTagClick(tag: TagWithVideoIDs | EmptyTag) { 
 		this.props.handleAddNewTag(tag.name)
 	}
 
 	render() {
 		if (!this.state.visible) return null;
-		let hintDOMs = this.getHints().map((tag, index) => 
+		let hintDOMs = this.getHints().map((tag: TagWithVideoIDs, index: number) => 
 			<Tag selected={index === this.state.selectedIndex} tag={tag} key={tag.name} handleClick={this.handleTagClick} />);
 		let hintsDOM = hintDOMs.length > 0 ? <ul>{hintDOMs}</ul> : null;
 		return (
@@ -166,7 +180,7 @@ export default class AddNewTag extends React.Component {
 				<input 
 					type="text" 
 					autoFocus={true} 
-					className={hintsDOM ? "has-hint" : null} 
+					className={hintsDOM ? "has-hint" : undefined} 
 					onChange={e => this.handleChange(e)}
 					value={this.state.value}
 					/>

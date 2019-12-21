@@ -1,10 +1,19 @@
 import React from 'react';
 import './Thumnail.css'
-const VideoPlayer = require('./VideoPlayer');
+import { VideoPath } from '../../share/bean/Video';
+import { SeekPosition, ScreenshotPath } from '../../share/bean/Screenshot';
+import VideoPlayer from './VideoPlayer';
 
-export default class Thumnail extends React.Component {
+interface Props {
+	videoPath: VideoPath;
+	seekPosition: SeekPosition;
+	screenshotPath: ScreenshotPath;
+	thumbnailStyle: React.CSSProperties;
+}
 
-	handleDoubleClick(event) {
+export default class Thumnail extends React.Component<Props> {
+
+	handleDoubleClick(event: React.MouseEvent) {
 		let videoPlayer = new VideoPlayer(this.props.videoPath, this.props.seekPosition);
 		videoPlayer.play();
 	}

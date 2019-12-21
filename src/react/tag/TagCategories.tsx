@@ -3,12 +3,23 @@ import TagCategory from './TagCategory'
 import Navigation from "../navigation/Navigation";
 import './TagCategories.scss'
 import '../styles/buttons.scss'
-const IPCInvoker = require('../ipc/IPCInvoker');
+import IPCInvoker from '../ipc/IPCInvoker';
+import { TagWithVideoIDs, TagType } from '../../share/bean/Tag';
 
 const CATEGORIES = [{name: "一级目录"}, {name: "二级目录"}, {name: "文件名"}, {name: "其它", isDefault: true}]
 
-export default class TagCategories extends React.Component {
-	constructor(props) {
+interface Props {
+
+}
+
+interface State {
+	tags: TagWithVideoIDs[];
+	dragging: boolean;
+	savingTagTypes: boolean;
+}
+
+export default class TagCategories extends React.Component<Props, State> {
+	constructor(props: Props) {
 		super(props);
 		this.state = {
 			tags: [],
@@ -23,10 +34,10 @@ export default class TagCategories extends React.Component {
 
 	reloadTags() {
 		return new IPCInvoker("dataLoader").invoke("loadAllTags")
-			.then(tags => this.setState({tags: tags.sort((a, b) => b.videoIDs.length - a.videoIDs.length)}));	
+			.then((tags: TagWithVideoIDs[]) => this.setState({tags: tags.sort((a, b) => b.videoIDs.length - a.videoIDs.length)}));	
 	}
 
-	handleTypeChange(tag, newType) {
+	handleTypeChange(tag: TagWithVideoIDs, newType: TagType) {
 		let tags = this.state.tags;
 		tags.filter(v => v.id === tag.id).forEach(v => v.type = newType);
 		this.setState({tags: tags, dragging: false});
@@ -60,8 +71,8 @@ export default class TagCategories extends React.Component {
 			handleDragTagEnd={this.handleDragTagEnd}
 		/>));
 		return (<div>
-			<Navigation />
-			<div id="tag-categories" className={this.state.dragging ? "dragging" : null}>
+			<Navigation name="tags" />
+			<div id="tag-categories" className={this.state.dragging ? "dragging" : undefined}>
 				{categories}
 				<div id="buttons">
 					<button 
