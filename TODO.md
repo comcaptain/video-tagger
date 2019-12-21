@@ -21,3 +21,7 @@
 - Scan video length, show following things on the screen:
   - A green bar for the video box that represents video length
   - A green bar for the thumnail that represents the seek position
+
+### Categories
+
+- If a video does not exist in level 1 directory, then list its tags, filenames and screenshots
