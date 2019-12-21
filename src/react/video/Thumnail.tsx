@@ -1,6 +1,6 @@
 import React from 'react';
 import './Thumnail.css'
-const VideoPlayer = require('./VideoPlayer.js');
+const VideoPlayer = require('./VideoPlayer');
 
 export default class Thumnail extends React.Component {
 

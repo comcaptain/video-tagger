@@ -3,7 +3,7 @@ import Video from './video/Video'
 import Tags from './tag/Tags'
 import Navigation from './navigation/Navigation'
 import './VideoList.css';
-const IPCInvoker = require('./ipc/IPCInvoker.js');
+const IPCInvoker = require('./ipc/IPCInvoker');
 
 export default class VideoList extends React.Component {
 	constructor(props) {

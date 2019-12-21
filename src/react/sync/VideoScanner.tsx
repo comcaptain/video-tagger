@@ -3,8 +3,8 @@ const path = require("path")
 const util = require('util');
 const fsReadDir = util.promisify(fs.readdir);
 const fsStat = util.promisify(fs.stat);
-const FingerprintCalculator = require('../../share/FingerprintCalculator.js')
-const IPCInvoker = require('../ipc/IPCInvoker.js');
+const FingerprintCalculator = require('../../share/FingerprintCalculator')
+const IPCInvoker = require('../ipc/IPCInvoker');
 const dataPersister = new IPCInvoker("dataPersister");
 
 const VIDEO_EXTENSIONS = new Set([".mp4", ".wmv", ".mkv", ".avi", ".rmvb", ".rm", ".flv", ".mov", ".3gp", ".VOB", ".MKV"]);

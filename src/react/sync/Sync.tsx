@@ -7,8 +7,8 @@ const fs = require("fs");
 const util = require("util");
 const fsDelete = util.promisify(fs.unlink);
 const dialog = require('electron').remote.dialog;
-const VideoScanner = require('./VideoScanner.js');
-const IPCInvoker = require('../ipc/IPCInvoker.js');
+const VideoScanner = require('./VideoScanner');
+const IPCInvoker = require('../ipc/IPCInvoker');
 const VideoPlayer = require('../video/VideoPlayer');
 
 export default class Sync extends React.Component {

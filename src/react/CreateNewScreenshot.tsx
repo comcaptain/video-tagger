@@ -2,7 +2,7 @@ import React from 'react';
 import Tags from './tag/Tags';
 import './CreateNewScreenshot.css';
 const { remote } = require('electron');
-const IPCInvoker = require('./ipc/IPCInvoker.js');
+const IPCInvoker = require('./ipc/IPCInvoker');
 
 export default class CreateNewScreenshot extends React.Component {
 	constructor(props) {

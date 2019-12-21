@@ -3,7 +3,7 @@ import TagCategory from './TagCategory'
 import Navigation from "../navigation/Navigation";
 import './TagCategories.scss'
 import '../styles/buttons.scss'
-const IPCInvoker = require('../ipc/IPCInvoker.js');
+const IPCInvoker = require('../ipc/IPCInvoker');
 
 const CATEGORIES = [{name: "一级目录"}, {name: "二级目录"}, {name: "文件名"}, {name: "其它", isDefault: true}]
 

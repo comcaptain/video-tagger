@@ -1,7 +1,7 @@
 import React from 'react';
 import './AddNewTag.scss';
 import Tag from './Tag';
-const IPCInvoker = require('../ipc/IPCInvoker.js');
+const IPCInvoker = require('../ipc/IPCInvoker');
 
 export default class AddNewTag extends React.Component {
 	constructor(props) {

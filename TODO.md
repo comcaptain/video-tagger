@@ -1,3 +1,6 @@
+### Tests
+- Verify that backup still works fine
+
 ### Fix bugs
 
 - ~~When ctrl + alt + t is pressed, automatically stops watching directory change after 3 seconds~~
