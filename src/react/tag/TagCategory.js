@@ -44,7 +44,7 @@ export default class TagCategory extends React.Component {
 
 	render() {
 		let props = this.props;
-		let tags = props.tags.filter(tag => props.name === tag.type || props.isDefault && !tag.type);
+		let tags = props.tags.filter(tag => props.name === tag.type || (props.isDefault && !tag.type));
 		let className = "tag-category";
 		if (this.state.draggingOver) className += " dragging-over";
 		return (
