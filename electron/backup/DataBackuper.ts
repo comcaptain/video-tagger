@@ -1,17 +1,22 @@
-const fs = require('fs');
-const util = require('util');
+import fs from 'fs';
+import util from 'util';
+import fse from 'fs-extra';
+import path from 'path';
+import formatDate from 'dateformat';
+import * as conf from '../../src/share/conf';
+import archiver from 'archiver';
+import BackupDataCleaner from './BackupDataCleaner';
 const fsMkdir = util.promisify(fs.mkdir);
 const fsCopyFile = util.promisify(fs.copyFile);
-const fse = require('fs-extra')
-const path = require('path');
-const formatDate = require('dateformat');
 const exec = util.promisify(require('child_process').exec);
-const conf = require('../../src/share/conf.js')
-const archiver = require('archiver');
-const BackupDataCleaner = require('./BackupDataCleaner.js');
+
+type BackupDirectory = string;
 
 class DataBackuper {
-	constructor(backupDirectories) {
+	private _backupDir1: BackupDirectory;
+	private _backupDirs: BackupDirectory[];
+	
+	constructor(backupDirectories: BackupDirectory[]) {
 		this._backupDir1 = path.join(backupDirectories[0], "video-tagger_" + formatDate(new Date(), "yyyy-mm-dd_HH.MM.ss.l"));
 		this._backupDirs = backupDirectories;
 	}

@@ -1,15 +1,12 @@
-const fs = require("fs")
-const path = require("path")
-const util = require('util');
+import fs from "fs";
+import path from "path";
+import util from 'util';
 const fsReadDir = util.promisify(fs.readdir);
 const fsRemove = util.promisify(fs.unlink);
 const fsStat = util.promisify(fs.stat);
 
-
-module.exports = class BackupDataCleaner {
-	constructor(directory) {
-		this._directory = directory;
-	}
+export default class BackupDataCleaner {
+	constructor(private _directory: string) {}
 
 	async clean() {
 		console.info("Cleaning up backup data in", this._directory);

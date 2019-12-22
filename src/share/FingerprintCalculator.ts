@@ -1,20 +1,19 @@
-const fs = require("fs");
-const util = require('util');
+import fs from "fs";
+import util from 'util';
+import { VideoPath } from './bean/Video';
 const fsOpen = util.promisify(fs.open);
 const fsRead = util.promisify(fs.read);
 const fsStat = util.promisify(fs.stat);
 const SAMPLE_BYTES_COUNT = 20;
 const SAMPLE_OFFSET = 1024 * 1024 * 20;
 
-module.exports = class FingerprintCalculator {
-	constructor(filePath) {
-		this._filePath = filePath;
-	}
+export default class FingerprintCalculator {
+	constructor(private _filePath: VideoPath) {}
 
 	calculate() {
 		return fsOpen(this._filePath, 'r').then(fd => {
 			let buffer = Buffer.alloc(SAMPLE_BYTES_COUNT * 3);
-			let promises = [];
+			let promises: Promise<any>[] = [];
 			return fsStat(this._filePath).then(stats => {
 				let size = stats.size;
 				if (size < SAMPLE_BYTES_COUNT * 3) {

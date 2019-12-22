@@ -1,40 +1,50 @@
-const fs = require("fs")
-const path = require("path")
-const util = require('util');
+import fs from "fs";
+import path from "path";
+import util from 'util';
+import FingerprintCalculator from './FingerprintCalculator';
+import { VideoPath } from './bean/Video';
 const fsReadDir = util.promisify(fs.readdir);
 const fsStat = util.promisify(fs.stat);
-const FingerprintCalculator = require('./FingerprintCalculator.js')
 
 const VIDEO_EXTENSIONS = new Set([".mp4", ".wmv", ".mkv", ".avi", ".rmvb", ".rm", ".flv", ".mov", ".3gp", ".VOB", ".MKV"]);
 
+interface FingerprintToPath {
+	[key: string]: VideoPath
+}
+
+type ScanDirectory = string;
+
 class FingerprintCollisionScanner {
-	constructor(...directories) {
+	private _directories: ScanDirectory[];
+	private _scannedDirectoryCount = 0;
+	private _scannedFileCount = 0;
+	private _scannedVideoFileCount = 0;
+	private _fingerprintToPath:FingerprintToPath  = {};
+	private _fingerprintCollisionCount = 0;
+	private _startTime = new Date();
+	private _status: string = "";
+
+	constructor(...directories: ScanDirectory[]) {
 		this._directories = directories;
 	}
 
 	scan() {
-		this._scannedDirectoryCount = 0;
-		this._scannedFileCount = 0;
-		this._scannedVideoFileCount = 0;
-		this._fingerprintToPath = {};
-		this._fingerprintCollisionCount = 0;
-		this._startTime = new Date().getTime();
 		this.updateStatus("Scan started");
 		return Promise.all(this._directories.map(this.scanDirectory, this)).then(() => {
 			this.updateStatus("Scan finished")
 		})
 	}
 
-	updateStatus(...statuses) {
-		this.status = `Scanned ${this._scannedDirectoryCount} directories, \
+	updateStatus(...statuses: string[]) {
+		this._status = `Scanned ${this._scannedDirectoryCount} directories, \
 ${this._scannedFileCount} files, \
 ${this._scannedVideoFileCount} videos; \
 Found ${this._fingerprintCollisionCount} fingerprint collisions \
-${msToTime(new Date().getTime() - this._startTime)} ${statuses.join( )}`;
-		console.info(this.status);
+${msToTime(new Date().getTime() - this._startTime.getTime())} ${statuses.join( )}`;
+		console.info(this._status);
 	}
 
-	scanDirectory(directory) {
+	scanDirectory(directory: ScanDirectory): Promise<any> {
 		// this.updateStatus("Scanning directory", directory);
 		return fsReadDir(directory, {withFileTypes: true}).then(files => Promise.all(files.map(file => {
 			let fullPath = path.join(directory, file.name);
@@ -65,28 +75,15 @@ ${msToTime(new Date().getTime() - this._startTime)} ${statuses.join( )}`;
 			});
 		}))).then(() => this._scannedDirectoryCount++)
 	}
-
-	isFileChanged(fullPath) {
-		let storedMTime = this._indexedVideos.getModifiedTime(fullPath);
-		if (storedMTime === undefined) return Promise.resolve(true);
-
-		return fsStat(fullPath).then(stats => {
-			return stats.mtime.getTime() !== storedMTime.getTime();
-		})
-	}
 }
 
-function msToTime(duration) {
-	let milliseconds = parseInt((duration % 1000) / 100),
+function msToTime(duration: number): string {
+	let milliseconds = Math.floor((duration % 1000) / 100),
 		seconds = Math.floor((duration / 1000) % 60),
 		minutes = Math.floor((duration / (1000 * 60)) % 60),
 		hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
 
-	hours = (hours < 10) ? "0" + hours : hours;
-	minutes = (minutes < 10) ? "0" + minutes : minutes;
-	seconds = (seconds < 10) ? "0" + seconds : seconds;
-
-	return hours + ":" + minutes + ":" + seconds + "." + milliseconds;
+	return `${(hours < 10) ? "0" + hours : hours}:${(minutes < 10) ? "0" + minutes : minutes}:${(seconds < 10) ? "0" + seconds : seconds}.${milliseconds}`;
 }
 
 new FingerprintCollisionScanner("V:/mirror", "V:/mirror_backup", "V:/new_mirror", "V:/video").scan();

@@ -1,15 +1,15 @@
 // CHCP 65001
-const conf = require('../src/share/conf.js');
-const { app, Menu } = require('electron')
-const TakeScreenshotListener = require("./TakeScreenshotListener.js")
-const ReactWindow = require('./ReactWindow.js');
-const dataPersister = require('./dataPersister.js');
-const dataLoader = require('./dataLoader.js')
-const IPCInvokerServer = require('./IPCInvokerServer.js')
-const path = require("path");
-const log = require('electron-log');
+import * as conf from '../src/share/conf';
+import { app, Menu, globalShortcut, BrowserWindow } from 'electron';
+import TakeScreenshotListener from "./TakeScreenshotListener"
+import ReactWindow from './ReactWindow';
+import dataPersister from './dataPersister';
+import dataLoader from './dataLoader'
+import IPCInvokerServer from './IPCInvokerServer'
+import path from "path";
+import log from 'electron-log';
 
-let mainWindow;
+let mainWindow: BrowserWindow | null;
 
 function createWindow() {
 	mainWindow = new ReactWindow("/index.html", {maximize: true}).open();
@@ -43,7 +43,7 @@ app.on('activate', () => {
 
 function initializeLogger() {
 	let format = '{y}-{m}-{d} {h}:{i}:{s}.{ms} [{level}] {text}';
-	log.transports.file.resolvePath = variables => path.join(conf.log_directory, variables.fileName);
+	log.transports.file.resolvePath = variables => path.join(conf.log_directory, variables.fileName!);
 	log.transports.console.format = format;
 	log.transports.file.format = format;
 	Object.assign(console, log.functions);

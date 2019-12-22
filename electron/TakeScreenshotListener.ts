@@ -1,17 +1,15 @@
-const conf = require('../src/share/conf.js');
-const { globalShortcut, clipboard, BrowserWindow } = require('electron')
-const fs = require('fs')
-const robot = require("robotjs");
-const VideoScreenshot = require("./VideoScreenshot.js");
-const ReactWindow = require('./ReactWindow.js');
-const processWindows = require("node-process-windows");
-const util = require('util');
+import * as conf from '../src/share/conf';
+import { globalShortcut, clipboard, BrowserWindow } from 'electron'
+import fs from 'fs'
+import robot from "robotjs";
+import VideoScreenshot from "./VideoScreenshot";
+import ReactWindow from './ReactWindow';
+import util from 'util';
+import processWindows from "node-process-windows";
 const getActiveWindow = util.promisify(processWindows.getActiveWindow);
 
-module.exports = class TakeScreenshotListener {
-	constructor(hotKey) {
-		this._hotKey = hotKey;
-	}
+export default class TakeScreenshotListener {
+	constructor(private _hotKey: string) {}
 
 	startListening() {
 		let registered = globalShortcut.register(this._hotKey, this.onTakeScreenshot.bind(this));
@@ -19,12 +17,12 @@ module.exports = class TakeScreenshotListener {
 			console.error("Failed to register hot key", this._hotKey);
 			return;
 		}
-		console.info("Registered hot key", this._hotKey);
+		console.info("Registered hot key.", this._hotKey);
 	}
 
 	async onTakeScreenshot() {
 		console.info("Take screenshot triggered")
-		let processName = await getActiveWindow().then(activeWindow => activeWindow.ProcessName);
+		let processName = await getActiveWindow().then((activeWindow:any) => activeWindow.ProcessName);
 		if (!processName.includes("PotPlayer")) {
 			console.info(`Active window's process name is ${processName}, not PotPlayer, do nothing`)
 			return;
@@ -39,10 +37,10 @@ module.exports = class TakeScreenshotListener {
 		new ReactWindow(screenshot.toURL(), {maximize: true}).open();
 	}
 
-	watchForNewScreenshot() {
+	watchForNewScreenshot(): Promise<string|null> {
 		let startTime = new Date().getTime();
 		return new Promise((resolve, reject) => {
-			let timeoutID;
+			let timeoutID: NodeJS.Timeout;
 			let watcher = fs.watch(conf.potplayer_screenshot_directory, (eventType, filename) => {
 				if (!filename) return;
 				clearTimeout(timeoutID);

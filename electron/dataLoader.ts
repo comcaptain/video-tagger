@@ -1,18 +1,26 @@
-const MongoClient = require('mongodb').MongoClient;
-const conf = require('../src/share/conf.js');
+import { MongoClient, Db, ObjectID } from 'mongodb';
+import * as conf from '../src/share/conf';
 const pinyin = require("chinese-to-pinyin");
+import { TagWithVideoIDs, TagModel, TagName } from '../src/share/bean/Tag';
+import { VideoWithScreenshots } from '../src/share/bean/Video';
+
+interface TagIDToTagMap {
+	[key: string]: TagModel
+}
+
+interface TagIDToNameMap {
+	[key: string]: TagName
+}
 
 class DataPersister {
-	constructor() {
-		this._dbPromise = new MongoClient(conf.mongo_db_url, {useUnifiedTopology: true}).connect().then(client => client.db(conf.mongo_db_name));
-	}
+	private _dbPromise: Promise<Db> = new MongoClient(conf.mongo_db_url, {useUnifiedTopology: true}).connect().then(client => client.db(conf.mongo_db_name));
 
-	async loadAllTags() {
+	async loadAllTags(): Promise<TagWithVideoIDs[]> {
 		console.info("Loading tags...")
 		let db = await this._dbPromise;
 		let tags = await db.collection("Tag").find({}).project({name: 1, type: 1}).toArray();
 		console.log(`Loaded, found ${tags.length} tags`)
-		let tagIDToTagMap = {};
+		let tagIDToTagMap:TagIDToTagMap = {};
 		tags.forEach(tag => tagIDToTagMap[tag._id] = tag);
 
 		console.info("Loading video count per tag...")
@@ -31,7 +39,7 @@ class DataPersister {
         		name: tag.name,
         		type: tag.type,
         		pinyin: nameInPinyin,
-        		videoIDs: group.video_ids.map(v => v.toString())
+        		videoIDs: group.video_ids.map((v: ObjectID) => v.toString())
         	}
         });
 	}
@@ -44,10 +52,10 @@ class DataPersister {
 		return videos;
 	}
 
-	async loadAllVideos() {
+	async loadAllVideos(): Promise<VideoWithScreenshots[]> {
 		console.log("Load all videoes started")
 		let allScreenshots = await this.loadAllScreenshots();
-		let videoIDToScreenshots = {};
+		let videoIDToScreenshots:any = {};
 		allScreenshots.forEach(screenshot => {
 			let videoID = screenshot.video_id;
 			if (!videoIDToScreenshots[videoID]) {
@@ -69,7 +77,7 @@ class DataPersister {
 
 	async loadAllScreenshots() {
 		let allTagPoints = await this.loadAllTagPoints();
-		let screenshotIDToTagNames = {};
+		let screenshotIDToTagNames:any = {};
 		allTagPoints.forEach(tagPoint => {
 			let screenshotID = tagPoint.screenshot_id;
 			if (!screenshotIDToTagNames[screenshotID]) {
@@ -94,12 +102,12 @@ class DataPersister {
 		})
 	}
 
-	async loadTagIDToNameMap() {
+	async loadTagIDToNameMap(): Promise<TagIDToNameMap> {
 		console.log("Loading tag ID to name map...")
 		let db = await this._dbPromise;
 		let tags = await db.collection("Tag").find({}).project({name: 1}).toArray();
 		console.log(`Loaded, found ${tags.length} tags`)
-		let tagIDToNameMap = {};
+		let tagIDToNameMap:TagIDToNameMap = {};
 		tags.forEach(tag => tagIDToNameMap[tag._id] = tag.name);
 		return tagIDToNameMap;
 	}
@@ -119,4 +127,4 @@ class DataPersister {
 	}
 }
 
-module.exports = new DataPersister();
+export default new DataPersister();

@@ -1,20 +1,22 @@
-const {MongoClient, ObjectID} = require('mongodb');
-const conf = require('../src/share/conf.js');
-const fs = require("fs");
-const path = require('path');
-const util = require('util');
+import {MongoClient, ObjectID, Db, Collection} from 'mongodb';
+import * as conf from '../src/share/conf'
+import fs from "fs";
+import path from 'path';
+import util from 'util';
+import FingerprintCalculator from '../src/share/FingerprintCalculator';
+import { TagName, TagID, TagType } from '../src/share/bean/Tag';
+import VideoScreenshot from './VideoScreenshot';
+import { VideoPath, VideoID, VideoModifiedTime } from '../src/share/bean/Video';
 const fsRename = util.promisify(fs.rename);
 const fsStat = util.promisify(fs.stat);
-const FingerprintCalculator = require("../src/share/FingerprintCalculator.js");
 
 class DataPersister {
-	constructor() {
-		this._dbPromise = new MongoClient(conf.mongo_db_url, {useUnifiedTopology: true}).connect().then(client => client.db(conf.mongo_db_name));
-	}
+	private _dbPromise: Promise<Db> = new MongoClient(conf.mongo_db_url, {useUnifiedTopology: true}).connect()
+		.then(client => client.db(conf.mongo_db_name));
 
-	async updateTagTypes(newTags) {
+	async updateTagTypes(newTags: {id: TagID, type: TagType, name: TagName}[]) {
 		let db = await this._dbPromise;
-		let tagIDToType = {};
+		let tagIDToType: {[key: string]: TagType} = {};
 		let tags = await db.collection("Tag").find({}).project({type: 1}).toArray();
 		tags.forEach(tag => tagIDToType[tag._id] = tag.type)
 		const bulkOperations = db.collection("Tag").initializeUnorderedBulkOp();
@@ -28,7 +30,7 @@ class DataPersister {
 		console.info(`Updated ${bulkOperations.length} tags' type:`, updateResult);
 	}
 
-	async persist(screenshot, tagNames) {
+	async persist(screenshot: VideoScreenshot, tagNames: TagName[]) {
 		let [tagIDs, videoScreenshot] = await Promise.all([this.loadOrSaveTags(tagNames), this.persistVideoScreenshot(screenshot)]);
 		if (tagNames.length === 0) return;
 		return this._dbPromise.then(db => {
@@ -45,11 +47,11 @@ class DataPersister {
 		})
 	}
 
-	async loadOrSaveTags(tagNames) {
+	async loadOrSaveTags(tagNames: TagName[]) {
 		console.info("Load or save tags", tagNames);
 		let db = await this._dbPromise;
 		let tagNameToIDMap = await this.loadTagNameToIDMap();
-		let tagIDs = [];
+		let tagIDs: TagID[] = [];
 		let createTime = new Date();
 		let newTags = tagNames.filter(tagName => {
 			let tagID = tagNameToIDMap[tagName];
@@ -64,7 +66,7 @@ class DataPersister {
 		return db.collection("Tag").insertMany(newTags).then(o => {
 			let savedNewTags = o.ops;
 			console.log(`Inserted ${savedNewTags.length} new Tag records`);
-			return tagIDs.concat(savedNewTags.map(v => v._id));
+			return tagIDs.concat(savedNewTags.map((v:any) => v._id.toString()));
 		})
 	}
 
@@ -73,12 +75,12 @@ class DataPersister {
 		let db = await this._dbPromise;
 		let tags = await db.collection("Tag").find({}).project({name: 1}).toArray();
 		console.log(`Loaded, found ${tags.length} tags`)
-		let tagNameToIDMap = {};
+		let tagNameToIDMap: {[key: string]: TagID} = {};
 		tags.forEach(tag => tagNameToIDMap[tag.name] = tag._id);
 		return tagNameToIDMap;
 	}
 
-	async persistVideoScreenshot(screenshot) {
+	async persistVideoScreenshot(screenshot: VideoScreenshot) {
 		let filePath = screenshot.screenshotFilePath;
 		let newFilePath = conf.screenshot_directory + "/" + path.basename(filePath, ".jpg") + new Date().getTime() + ".jpg";
 		let db = await this._dbPromise;
@@ -100,7 +102,7 @@ class DataPersister {
 		})
 	}
 
-	loadOrSaveVideo(videoPath) {
+	loadOrSaveVideo(videoPath: VideoPath) {
 		return fsStat(videoPath).then(stats => this._dbPromise.then(db => {
 			let videoCollection = db.collection("Video");
 			let condition = {path: videoPath, last_modified_time: stats.mtime};
@@ -116,7 +118,7 @@ class DataPersister {
 		}))
 	}
 
-	updateVideoPath(videoID, newVideoPath) {
+	updateVideoPath(videoID: VideoID, newVideoPath: VideoPath) {
 		console.info(`Updating path of video ${videoID} to ${newVideoPath}...`)
 		return this._dbPromise
 			.then(db => db.collection("Video"))
@@ -136,7 +138,7 @@ class DataPersister {
 			.then(() => console.info("Refreshed all fingerprints!"));
 	}
 
-	async refreshFingerprint(id, path) {
+	async refreshFingerprint(id: VideoID, path: VideoPath) {
 		let collection = await this._dbPromise.then(db => db.collection("Video"));
 		return new FingerprintCalculator(path).calculate()
 			.then(fingerprint => {
@@ -146,7 +148,7 @@ class DataPersister {
 			.then(() => console.info("Refreshed fingerprint for", path))
 	}
 
-	insertVideo(videoCollection, videoPath, mtime) {
+	insertVideo(videoCollection: Collection, videoPath: VideoPath, mtime: VideoModifiedTime) {
 		console.log("Calculating fingerprint for", videoPath)
 		return new FingerprintCalculator(videoPath).calculate().then(fingerprint => {
 			let record = {
@@ -164,4 +166,4 @@ class DataPersister {
 	}
 }
 
-module.exports = new DataPersister();
+export default new DataPersister();

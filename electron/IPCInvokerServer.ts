@@ -1,10 +1,8 @@
-const { ipcMain } = require('electron')
+import { ipcMain } from 'electron'
 
-module.exports = class IPCInvokerServer {
-	constructor(instance, name) {
-		this._instance = instance;
-		this._name = name;
-	}
+export default class IPCInvokerServer {
+	constructor(private _instance: any, private _name: string) {}
+
 	start() {
 		console.log("Starting IPC invoker server for", this._name)
 		ipcMain.handle(this._name, async (event, functionName, parameters) => {
