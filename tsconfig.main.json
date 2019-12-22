@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "moduleResolution": "node",
+    "pretty": true,
+    "newLine": "LF",
+    "esModuleInterop": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "jsx": "preserve",
+    "outDir": "build"
+  },
+  "include": [
+    "electron", "src/share"
+  ],
+  "exclude": [
+      "node_modules",
+  ]
+}
