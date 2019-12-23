@@ -1,0 +1,38 @@
+.video {
+	border: 1px dashed silver;
+	border-radius: 10px;
+	padding: 10px;
+	margin-top: 20px;
+	position: relative;
+	padding-right: 3px;
+	padding-top: 16px;
+
+	&::after {
+		content: "";
+		clear: both;
+		display: block;
+	}
+
+	.video-meta-data {
+		position: absolute;
+		top: -20px;
+		width: 100%;
+		cursor: pointer;
+	
+		& > * {
+			display: inline-block;
+			background: white;
+		}
+		
+		& > .video-tags {
+			padding-left: 3px;
+		}
+		
+		& .path {
+			position: absolute;
+			right: 22px;
+			top: 7px;
+			padding: 0 3px;
+		}
+	}
+}
