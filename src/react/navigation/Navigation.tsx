@@ -1,6 +1,7 @@
 import React from "react";
 import './Navigation.css'
-const ReactWindow = require("electron").remote.require('./ReactWindow.js');
+import {remote} from 'electron';
+const ReactWindow = remote.require('./ReactWindow').default;
 
 const ROUTES = [
 	{name: "list", url: "/", description: "视频列表"},
