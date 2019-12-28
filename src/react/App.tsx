@@ -16,7 +16,7 @@ export default function App() {
 				<Route path="/tag/create">
 					<CreateNewScreenshot />
 				</Route>
-				<Route path="/sync">\
+				<Route path="/sync">
 					<Sync />
 				</Route>
 				<Route path="/tags">

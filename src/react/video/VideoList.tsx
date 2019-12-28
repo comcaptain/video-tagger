@@ -35,14 +35,16 @@ export default class VideoList extends React.Component<Props, State> {
 		let videoDOMs = filtered.map(video => <Video {...video} key={video.path} thumbnailStyle={thumbnailStyle} />);
 		return (<div>
 			<Navigation name="list" />
-			<div id="video-list">
-				{filtered.length}个视频
-				<input type="number" 
-					id="screenshots-per-line" 
-					onChange={this.updateScreenshotsPerLine} 
-					value={this.state.screenshotsPerLine} />
-                {filterDOM}
-				{videoDOMs}
+			<div id="videos-container">
+				<div id="videos-meta">
+					<span id="video-count">{filtered.length}个视频</span>
+					<input type="number" 
+						id="screenshots-per-line" 
+						onChange={this.updateScreenshotsPerLine} 
+						value={this.state.screenshotsPerLine} />
+					{filterDOM}
+				</div>
+				<div id="video-list">{videoDOMs}</div>
 			</div>
 		</div>)
 	}
