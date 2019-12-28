@@ -5,7 +5,7 @@ import {
 	Route
 } from "react-router-dom";
 import CreateNewScreenshot from './CreateNewScreenshot';
-import VideoList from './VideoList'
+import Home from './Home'
 import TagCategories from './tag/TagCategories'
 import Sync from './sync/Sync'
 
@@ -16,14 +16,14 @@ export default function App() {
 				<Route path="/tag/create">
 					<CreateNewScreenshot />
 				</Route>
-				<Route path="/sync">
+				<Route path="/sync">\
 					<Sync />
 				</Route>
 				<Route path="/tags">
 					<TagCategories />
 				</Route>
 				<Route path="/">
-					<VideoList />
+					<Home />
 				</Route>
 			</Switch>
 		</Router>
