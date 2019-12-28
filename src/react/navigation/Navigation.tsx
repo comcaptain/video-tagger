@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import './Navigation.css'
 import {remote} from 'electron';
 import { useHistory } from "react-router-dom";

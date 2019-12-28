@@ -9,14 +9,20 @@ import Home from './Home'
 import TagCategories from './tag/TagCategories'
 import Sync from './sync/Sync'
 import { remote } from 'electron';
+// @ts-ignore
+import { FindInPage } from 'electron-find';
 import Navigation from "./navigation/Navigation";
+const findInPage = new FindInPage(remote.getCurrentWebContents());
 
 export default function App() {
 
-	useEffect(() => {
+	useEffect(() => {		
 		function handleKeyDown(event: KeyboardEvent) {
 			if (event.key === 'F12') {
 				remote.getCurrentWebContents().toggleDevTools();
+			}
+			else if (event.ctrlKey && event.key === 'f') {
+				findInPage.openFindWindow();
 			}
 		}
 		document.addEventListener("keydown", handleKeyDown);
