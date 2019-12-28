@@ -35,7 +35,7 @@ class DataPersister {
 		if (tagNames.length === 0) return;
 		return this._dbPromise.then(db => {
 			let tagPoints = tagIDs.map(tagID => ({
-				tag_id: tagID,
+				tag_id: new ObjectID(tagID),
 				video_id: videoScreenshot.video_id,
 				screenshot_id: videoScreenshot._id
 			}));
@@ -76,7 +76,7 @@ class DataPersister {
 		let tags = await db.collection("Tag").find({}).project({name: 1}).toArray();
 		console.log(`Loaded, found ${tags.length} tags`)
 		let tagNameToIDMap: {[key: string]: TagID} = {};
-		tags.forEach(tag => tagNameToIDMap[tag.name] = tag._id);
+		tags.forEach(tag => tagNameToIDMap[tag.name] = tag._id.toString());
 		return tagNameToIDMap;
 	}
 
