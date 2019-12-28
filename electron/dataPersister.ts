@@ -26,6 +26,7 @@ class DataPersister {
 			console.info(`Update type of ${newTag.name} from ${oldType} to ${newTag.type}`);
 			bulkOperations.find({_id: new ObjectID(newTag.id)}).updateOne({$set: {type: newTag.type}});
 		})
+		if (bulkOperations.length === 0) return;
 		let updateResult = await bulkOperations.execute();
 		console.info(`Updated ${bulkOperations.length} tags' type:`, updateResult);
 	}

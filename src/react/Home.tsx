@@ -3,6 +3,7 @@ import { TagName } from '../share/bean/Tag';
 import Tags from './tag/Tags';
 import VideoList from './video/VideoList';
 import { VideoWithScreenshots } from '../share/bean/Video';
+import './Home.scss';
 
 interface Props {
 
@@ -48,6 +49,6 @@ export default class Home extends React.Component<Props, State> {
 	}
 
 	render() {
-		return (<div><VideoList filter={this.filter.bind(this)}></VideoList></div>)
+		return (<div id="home"><VideoList filter={this.filter.bind(this)}></VideoList></div>)
 	}
 }

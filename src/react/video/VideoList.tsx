@@ -6,7 +6,8 @@ import { VideoWithScreenshots } from '../../share/bean/Video';
 import IPCInvoker from '../ipc/IPCInvoker';
 
 interface Props {
-    filter: (vidoes: VideoWithScreenshots[]) => {filtered: VideoWithScreenshots[], filterDOM?: any};
+    filter: (vidoes: VideoWithScreenshots[]) => {filtered: VideoWithScreenshots[], filterDOM?: any, hideVideoList?: boolean};
+	collapsedByDefault?: boolean;
 }
 
 interface State {
@@ -31,8 +32,9 @@ export default class VideoList extends React.Component<Props, State> {
 	render() {
 		let videos = this.state.videos;
         let thumbnailStyle = {width: `calc(${100 / this.state.screenshotsPerLine}% - 1px)`}
-        let {filtered, filterDOM} = this.props.filter(videos);
-		let videoDOMs = filtered.map(video => <Video {...video} key={video.path} thumbnailStyle={thumbnailStyle} />);
+		let {filtered, filterDOM, hideVideoList} = this.props.filter(videos);
+		if (hideVideoList) return null;
+		let videoDOMs = filtered.map(video => <Video {...video} collapsedByDefault={this.props.collapsedByDefault} key={video.path} thumbnailStyle={thumbnailStyle} />);
 		return (<div>
 			<Navigation name="list" />
 			<div id="videos-container">

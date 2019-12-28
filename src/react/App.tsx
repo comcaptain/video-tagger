@@ -32,21 +32,13 @@ export default function App() {
 	return (
 		<Router>
 			<Switch>
-				<Route path="/tag/create">
-					<CreateNewScreenshot />
-				</Route>
-				<Route path="/sync">
-					<Sync />
-				</Route>
-				<Route path="/tags">
-					<TagCategories />
-				</Route>
+				<Route path="/tag/create" component = {CreateNewScreenshot} />
+				<Route path="/sync" component = {Sync} />
+				<Route path="/tags" component = {TagCategories} />
 				<Route path="/empty">
 					<Navigation name="empty" />
 				</Route>
-				<Route path="/">
-					<Home />
-				</Route>
+				<Route path="/" component = {Home} />
 			</Switch>
 		</Router>
 	);

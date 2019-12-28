@@ -1,26 +1,3 @@
-#videos-container {
-	width: calc(100% - 50px);
-	margin-left: 50px;
-	display: flex;
-	flex-direction: column;
-	height: 100vh;
-}
-
-#video-count {
-	vertical-align: -6px;
-}
-
-#video-list {
-    overflow-y: auto;
-    padding-right: 50px;
-}
-
-#videos-meta {	
-	margin-right: 50px;
-	border-bottom: 1px solid green;
-	vertical-align: -6px;
-}
-
 #screenshots-per-line {
 	border-radius: 5px;
 	padding: 2px 5px;

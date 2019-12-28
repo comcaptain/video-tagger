@@ -9,7 +9,8 @@ import { VideoPath } from '../../share/bean/Video';
 interface Props {
 	screenshots: Screenshot[];
 	thumbnailStyle: React.CSSProperties;
-	path: VideoPath;
+    path: VideoPath;
+    collapsedByDefault?: boolean;
 }
 
 interface State {
@@ -20,7 +21,7 @@ export default class Video extends React.Component<Props, State> {
     constructor(props: Props) {
 		super(props);
 		this.state = {
-			collapsed: false
+			collapsed: !!props.collapsedByDefault
 		}
     }
 

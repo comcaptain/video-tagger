@@ -5,8 +5,11 @@ import './TagCategories.scss'
 import '../styles/buttons.scss'
 import IPCInvoker from '../ipc/IPCInvoker';
 import { TagWithVideoIDs, TagType } from '../../share/bean/Tag';
+import { VideoWithScreenshots } from '../../share/bean/Video';
+import Tag from './Tag';
+import VideoList from '../video/VideoList';
 
-const CATEGORIES = [{name: "一级目录"}, {name: "二级目录"}, {name: "文件名"}, {name: "其它", isDefault: true}]
+const CATEGORIES = [{type: TagType.FIRST_LEVEL}, {type: TagType.SECOND_LEVEL}, {type: TagType.FILE_NAME}, {type: TagType.OTHER, isDefault: true}]
 
 interface Props {
 
@@ -29,6 +32,7 @@ export default class TagCategories extends React.Component<Props, State> {
 		this.handleTypeChange = this.handleTypeChange.bind(this);
 		this.handleDragTagStart = this.handleDragTagStart.bind(this);
 		this.handleDragTagEnd = this.handleDragTagEnd.bind(this);
+		this.filter = this.filter.bind(this);
 		this.reloadTags();
 	}
 
@@ -60,20 +64,38 @@ export default class TagCategories extends React.Component<Props, State> {
 			.then(() => this.setState({savingTagTypes: false}));
 	}
 
+	filter(videos: VideoWithScreenshots[]) {
+		let tagNames = this.state.tags
+			.filter(tag => tag.type === TagType.FIRST_LEVEL || tag.type === TagType.SECOND_LEVEL)
+			.map(tag => tag.name);
+		let filteredVideos = videos;
+		if (tagNames.length > 0) {
+			filteredVideos = videos.filter(video => {
+				let videoTagNames = new Set();
+				video.screenshots.forEach(screenshot => screenshot.tagNames.forEach(videoTagNames.add, videoTagNames));
+				return !tagNames.some(videoTagNames.has, videoTagNames);
+			});
+		}
+		let videoIDs = filteredVideos.map(v => v.id);
+		return {filtered: filteredVideos, filterDOM: <div>下面的视频都没有目录标签</div>, hideVideoList: videoIDs.length === 0};
+	}
+
 	render() {
 		const categories = CATEGORIES.map(category => (<TagCategory 
 			tags={this.state.tags}
-			key={category.name}
-			name={category.name}
+			key={category.type}
+			name={category.type}
 			isDefault={category.isDefault}
 			handleTypeChange={this.handleTypeChange}
 			handleDragTagStart={this.handleDragTagStart}
 			handleDragTagEnd={this.handleDragTagEnd}
 		/>));
+		const videoList = <VideoList filter={this.filter} collapsedByDefault={true} />;
 		return (<div>
 			<Navigation name="tags" />
 			<div id="tag-categories" className={this.state.dragging ? "dragging" : undefined}>
 				{categories}
+				<VideoList filter={this.filter} collapsedByDefault={true} />
 				<div id="buttons">
 					<button 
 						disabled={this.state.savingTagTypes} 

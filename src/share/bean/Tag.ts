@@ -17,4 +17,9 @@ export interface EmptyTag {
 export type PinYin = string;
 export type TagID = string;
 export type TagName = string;
-export type TagType = string;
+export enum TagType {
+	FIRST_LEVEL="一级目录",
+	SECOND_LEVEL="二级目录",
+	FILE_NAME="文件名",
+	OTHER="其它"
+};
