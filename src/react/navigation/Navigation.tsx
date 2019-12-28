@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import './Navigation.css'
 import {remote} from 'electron';
 import { useHistory } from "react-router-dom";
@@ -24,6 +24,17 @@ export default function Navigation(props: Props) {
 			history.push(url);
 		}
 	}
+	useEffect(() => {
+		function handleKeyDown(event: KeyboardEvent) {
+			if (event.key === 'F5') {
+				let current = window.location.pathname;
+				history.replace("/empty");
+				setTimeout(() => history.replace(current));
+			}
+		}
+		document.addEventListener("keydown", handleKeyDown);
+		return () => document.removeEventListener("keydown", handleKeyDown);
+	});
 	let items = ROUTES.map(route => (<li key={route.name}>
 		<img
 			src={`/icons/${route.name}.svg`} 
