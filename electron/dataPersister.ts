@@ -123,7 +123,7 @@ class DataPersister {
 		console.info(`Updating path of video ${videoID} to ${newVideoPath}...`)
 		return this._dbPromise
 			.then(db => db.collection("Video"))
-			.then(collection => collection.updateOne({_id: videoID}, {$set: {path: newVideoPath}}))
+			.then(collection => collection.updateOne({_id: new ObjectID(videoID)}, {$set: {path: newVideoPath}}))
 			.then(() => console.info(`Updated path of video ${videoID} to ${newVideoPath}`))
 	}
 
