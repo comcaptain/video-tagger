@@ -37,9 +37,9 @@ export default class TagCategories extends React.Component<Props, State> {
 		new IPCInvoker("dataLoader").invoke("loadAllVideos").then((v: VideoWithScreenshots[]) => this.setState({videos: v.reverse()}));
 	}
 
-	reloadTags() {
-		return new IPCInvoker("dataLoader").invoke("loadAllTags")
-			.then((tags: TagWithVideoIDs[]) => this.setState({tags: tags.sort((a, b) => b.videoIDs.length - a.videoIDs.length)}));	
+	async reloadTags() {
+		const tags = await new IPCInvoker("dataLoader").invoke("loadAllTags");
+		return this.setState({ tags: tags.sort((a: TagWithVideoIDs, b: TagWithVideoIDs) => b.videoIDs.length - a.videoIDs.length) });	
 	}
 
 	handleTypeChange(tag: TagWithVideoIDs, newType: TagType) {
