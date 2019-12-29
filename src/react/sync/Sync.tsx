@@ -70,6 +70,7 @@ export default class Sync extends React.Component<Props, State> {
 	}
 
 	async doCleanup() {
+		if (!window.confirm("你确定要做清理吗？")) return;
 		this.setState({scanning: true, status: "Clean up started..."});
 		let cleaner = new FileCleaner(this.state.directories);
 		let timer = setInterval(() => this.setState({status: cleaner.status}), 100);
