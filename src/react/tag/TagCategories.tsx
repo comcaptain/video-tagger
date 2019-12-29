@@ -9,7 +9,7 @@ import { VideoWithScreenshots } from '../../share/bean/Video';
 import VideoList from '../video/VideoList';
 import VideoMover from './VideoMover';
 
-const CATEGORIES = [{type: TagType.FIRST_LEVEL}, {type: TagType.SECOND_LEVEL}, {type: TagType.FILE_NAME}, {type: TagType.OTHER, isDefault: true}]
+const CATEGORIES = [{type: TagType.FIRST_LEVEL}, {type: TagType.SECOND_LEVEL}, {type: TagType.OTHER}, {type: TagType.NOT_CATEGORIZED, isDefault: true}]
 
 interface Props {
 

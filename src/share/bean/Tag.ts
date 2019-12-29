@@ -20,6 +20,6 @@ export type TagName = string;
 export enum TagType {
 	FIRST_LEVEL="一级目录",
 	SECOND_LEVEL="二级目录",
-	FILE_NAME="文件名",
-	OTHER="其它"
+	OTHER="其它",
+	NOT_CATEGORIZED="未分类",
 };
