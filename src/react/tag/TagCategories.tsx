@@ -33,7 +33,6 @@ export default class TagCategories extends React.Component<Props, State> {
 		this.handleTypeChange = this.handleTypeChange.bind(this);
 		this.handleDragTagStart = this.handleDragTagStart.bind(this);
 		this.handleDragTagEnd = this.handleDragTagEnd.bind(this);
-		this.filter = this.filter.bind(this);
 		this.reloadTags();
 		new IPCInvoker("dataLoader").invoke("loadAllVideos").then((v: VideoWithScreenshots[]) => this.setState({videos: v.reverse()}));
 	}
@@ -66,10 +65,11 @@ export default class TagCategories extends React.Component<Props, State> {
 			.then(() => this.setState({savingTagTypes: false}));
 	}
 
-	filter(videos: VideoWithScreenshots[]) {
+	getFilteredVideos() {
 		let tagNames = this.state.tags
 			.filter(tag => tag.type === TagType.FIRST_LEVEL || tag.type === TagType.SECOND_LEVEL)
 			.map(tag => tag.name);
+		let videos = this.state.videos;
 		let filteredVideos = videos;
 		if (tagNames.length > 0) {
 			filteredVideos = videos.filter(video => {
@@ -78,8 +78,7 @@ export default class TagCategories extends React.Component<Props, State> {
 				return !tagNames.some(videoTagNames.has, videoTagNames);
 			});
 		}
-		let videoIDs = filteredVideos.map(v => v.id);
-		return {filtered: filteredVideos, filterDOM: <div>下面的视频都没有目录标签</div>, hideVideoList: videoIDs.length === 0};
+		return filteredVideos;
 	}
 
 	render() {
@@ -92,17 +91,20 @@ export default class TagCategories extends React.Component<Props, State> {
 			handleDragTagStart={this.handleDragTagStart}
 			handleDragTagEnd={this.handleDragTagEnd}
 		/>));
+		let filteredVideos = this.getFilteredVideos();
+		let videoIDs = filteredVideos.map(v => v.id);
+		let videoListDOM = videoIDs.length > 0 ? <VideoList videos={filteredVideos} collapsedByDefault={true}><div>下面的视频都没有目录标签</div></VideoList> : null;
 		return (<div>
 			<Navigation name="tags" />
 			<div id="tag-categories" className={this.state.dragging ? "dragging" : undefined}>
 				{categories}
-				<VideoList videos={this.state.videos} filter={this.filter} collapsedByDefault={true} />
 				<div id="buttons">
 					<button 
 						disabled={this.state.savingTagTypes} 
 						className="action-button green" 
 						onClick={this.saveTagTypes.bind(this)}>保存标签分类</button>
 				</div>
+				{videoListDOM}
 			</div>
 		</div>)
 	}

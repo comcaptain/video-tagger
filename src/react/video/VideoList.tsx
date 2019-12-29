@@ -5,7 +5,6 @@ import './VideoList.css';
 import { VideoWithScreenshots } from '../../share/bean/Video';
 
 interface Props {
-    filter: (vidoes: VideoWithScreenshots[]) => {filtered: VideoWithScreenshots[], filterDOM?: any, hideVideoList?: boolean};
 	collapsedByDefault?: boolean;
 	videos: VideoWithScreenshots[];
 }
@@ -30,19 +29,17 @@ export default class VideoList extends React.Component<Props, State> {
 	render() {
 		let videos = this.props.videos;
         let thumbnailStyle = {width: `calc(${100 / this.state.screenshotsPerLine}% - 1px)`}
-		let {filtered, filterDOM, hideVideoList} = this.props.filter(videos);
-		if (hideVideoList) return null;
-		let videoDOMs = filtered.map(video => <Video {...video} collapsedByDefault={this.props.collapsedByDefault} key={video.path} thumbnailStyle={thumbnailStyle} />);
+		let videoDOMs = videos.map(video => <Video {...video} collapsedByDefault={this.props.collapsedByDefault} key={video.path} thumbnailStyle={thumbnailStyle} />);
 		return (<div>
 			<Navigation name="list" />
 			<div id="videos-container">
 				<div id="videos-meta">
-					<span id="video-count">{filtered.length}个视频</span>
+					<span id="video-count">{videos.length}个视频</span>
 					<input type="number" 
 						id="screenshots-per-line" 
 						onChange={this.updateScreenshotsPerLine} 
 						value={this.state.screenshotsPerLine} />
-					{filterDOM}
+					{this.props.children}
 				</div>
 				<div id="video-list">{videoDOMs}</div>
 			</div>

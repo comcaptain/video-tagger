@@ -36,8 +36,9 @@ export default class Home extends React.Component<Props, State> {
 		})
 	}
 
-	filter(videos: VideoWithScreenshots[]) {		
+	getFilteredVideos() {		
 		let tagNames = this.state.tagNames;
+		let videos = this.state.videos;
 		let filteredVideos = videos;
 		if (tagNames.length > 0) {
 			filteredVideos = videos.filter(video => {
@@ -46,12 +47,13 @@ export default class Home extends React.Component<Props, State> {
 				return tagNames.every(videoTagNames.has, videoTagNames);
 			});
 		}
-		let videoIDs = filteredVideos.map(v => v.id);
-		let filterDOM = <Tags tags={this.state.tagNames.map(v => ({name: v}))} videoIDs={videoIDs} handleAddNewTag={this.handleAddNewTag} handleRemoveTag={this.handleRemoveTag} />;
-		return {filtered: filteredVideos, filterDOM: filterDOM};
+		return filteredVideos;
 	}
 
 	render() {
-		return (<div id="home"><VideoList videos={this.state.videos} filter={this.filter.bind(this)}></VideoList></div>)
+		let filteredVideos = this.getFilteredVideos();
+		let videoIDs = filteredVideos.map(v => v.id);
+		let tagsDOM = <Tags tags={this.state.tagNames.map(v => ({name: v}))} videoIDs={videoIDs} handleAddNewTag={this.handleAddNewTag} handleRemoveTag={this.handleRemoveTag} />;
+		return (<div id="home"><VideoList videos={filteredVideos}>{tagsDOM}</VideoList></div>)
 	}
 }
