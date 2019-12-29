@@ -4,6 +4,7 @@ import Tags from './tag/Tags';
 import VideoList from './video/VideoList';
 import { VideoWithScreenshots } from '../share/bean/Video';
 import './Home.scss';
+import IPCInvoker from './ipc/IPCInvoker';
 
 interface Props {
 
@@ -11,14 +12,16 @@ interface Props {
 
 interface State {
 	tagNames: TagName[];
+	videos: VideoWithScreenshots[]
 }
 
 export default class Home extends React.Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
-		this.state = {tagNames: []};
+		this.state = {tagNames: [], videos: []};
 		this.handleAddNewTag = this.handleAddNewTag.bind(this);
 		this.handleRemoveTag = this.handleRemoveTag.bind(this);
+		new IPCInvoker("dataLoader").invoke("loadAllVideos").then((v: VideoWithScreenshots[]) => this.setState({videos: v.reverse()}));
 	}
 
 	handleAddNewTag(newTagName: TagName) {
@@ -49,6 +52,6 @@ export default class Home extends React.Component<Props, State> {
 	}
 
 	render() {
-		return (<div id="home"><VideoList filter={this.filter.bind(this)}></VideoList></div>)
+		return (<div id="home"><VideoList videos={this.state.videos} filter={this.filter.bind(this)}></VideoList></div>)
 	}
 }

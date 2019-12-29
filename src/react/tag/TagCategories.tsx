@@ -6,7 +6,6 @@ import '../styles/buttons.scss'
 import IPCInvoker from '../ipc/IPCInvoker';
 import { TagWithVideoIDs, TagType } from '../../share/bean/Tag';
 import { VideoWithScreenshots } from '../../share/bean/Video';
-import Tag from './Tag';
 import VideoList from '../video/VideoList';
 
 const CATEGORIES = [{type: TagType.FIRST_LEVEL}, {type: TagType.SECOND_LEVEL}, {type: TagType.FILE_NAME}, {type: TagType.OTHER, isDefault: true}]
@@ -19,6 +18,7 @@ interface State {
 	tags: TagWithVideoIDs[];
 	dragging: boolean;
 	savingTagTypes: boolean;
+	videos: VideoWithScreenshots[]
 }
 
 export default class TagCategories extends React.Component<Props, State> {
@@ -27,13 +27,15 @@ export default class TagCategories extends React.Component<Props, State> {
 		this.state = {
 			tags: [],
 			dragging: false,
-			savingTagTypes: false
+			savingTagTypes: false,
+			videos: []
 		};
 		this.handleTypeChange = this.handleTypeChange.bind(this);
 		this.handleDragTagStart = this.handleDragTagStart.bind(this);
 		this.handleDragTagEnd = this.handleDragTagEnd.bind(this);
 		this.filter = this.filter.bind(this);
 		this.reloadTags();
+		new IPCInvoker("dataLoader").invoke("loadAllVideos").then((v: VideoWithScreenshots[]) => this.setState({videos: v.reverse()}));
 	}
 
 	reloadTags() {
@@ -90,12 +92,11 @@ export default class TagCategories extends React.Component<Props, State> {
 			handleDragTagStart={this.handleDragTagStart}
 			handleDragTagEnd={this.handleDragTagEnd}
 		/>));
-		const videoList = <VideoList filter={this.filter} collapsedByDefault={true} />;
 		return (<div>
 			<Navigation name="tags" />
 			<div id="tag-categories" className={this.state.dragging ? "dragging" : undefined}>
 				{categories}
-				<VideoList filter={this.filter} collapsedByDefault={true} />
+				<VideoList videos={this.state.videos} filter={this.filter} collapsedByDefault={true} />
 				<div id="buttons">
 					<button 
 						disabled={this.state.savingTagTypes} 

@@ -3,24 +3,22 @@ import Video from './Video'
 import Navigation from '../navigation/Navigation'
 import './VideoList.css';
 import { VideoWithScreenshots } from '../../share/bean/Video';
-import IPCInvoker from '../ipc/IPCInvoker';
 
 interface Props {
     filter: (vidoes: VideoWithScreenshots[]) => {filtered: VideoWithScreenshots[], filterDOM?: any, hideVideoList?: boolean};
 	collapsedByDefault?: boolean;
+	videos: VideoWithScreenshots[];
 }
 
 interface State {
-	videos: VideoWithScreenshots[];
 	screenshotsPerLine: number;
 }
 
 export default class VideoList extends React.Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
-		this.state = {videos: [], screenshotsPerLine: 4};
+		this.state = {screenshotsPerLine: 4};
 		this.updateScreenshotsPerLine = this.updateScreenshotsPerLine.bind(this);
-		new IPCInvoker("dataLoader").invoke("loadAllVideos").then((v: VideoWithScreenshots[]) => this.setState({videos: v.reverse()}));
 	}
 
 	updateScreenshotsPerLine(event: React.ChangeEvent<HTMLInputElement>) {
@@ -30,7 +28,7 @@ export default class VideoList extends React.Component<Props, State> {
 	}
 
 	render() {
-		let videos = this.state.videos;
+		let videos = this.props.videos;
         let thumbnailStyle = {width: `calc(${100 / this.state.screenshotsPerLine}% - 1px)`}
 		let {filtered, filterDOM, hideVideoList} = this.props.filter(videos);
 		if (hideVideoList) return null;
