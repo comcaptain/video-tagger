@@ -19,7 +19,8 @@ interface State {
 	tags: TagWithVideoIDs[];
 	dragging: boolean;
 	savingTagTypes: boolean;
-	videos: VideoWithScreenshots[]
+	videos: VideoWithScreenshots[];
+	status?: string;
 }
 
 export default class TagCategories extends React.Component<Props, State> {
@@ -82,9 +83,17 @@ export default class TagCategories extends React.Component<Props, State> {
 		return filteredVideos;
 	}
 
-	moveVideos() {
-		// Move path to conf
-		new VideoMover('v:/tagged_mirror', this.state.tags, this.state.videos).move();
+	async moveVideos() {
+		const videoMover = new VideoMover('v:/tagged_mirror', this.state.tags, this.state.videos);
+		let self = this;
+		function refreshLog() {
+			self.setState({status: videoMover.logLines.join("\n")});
+		}
+		let timer = setInterval(refreshLog, 10);
+		// TODO: Move path to conf
+		await videoMover.move();
+		clearInterval(timer);
+		refreshLog();
 	}
 
 	render() {
@@ -100,6 +109,7 @@ export default class TagCategories extends React.Component<Props, State> {
 		let filteredVideos = this.getFilteredVideos();
 		let videoIDs = filteredVideos.map(v => v.id);
 		let videoListDOM = videoIDs.length > 0 ? <VideoList videos={filteredVideos} collapsedByDefault={true}><div>下面的视频都没有目录标签</div></VideoList> : null;
+		let statusDOM = this.state.status ? (<div id="status">{this.state.status}</div>) : null;
 		return (<div>
 			<Navigation name="tags" />
 			<div id="tag-categories" className={this.state.dragging ? "dragging" : undefined}>
@@ -114,6 +124,7 @@ export default class TagCategories extends React.Component<Props, State> {
 						className="action-button green" 
 						onClick={this.moveVideos.bind(this)}>按照标签移动视频</button>
 				</div>
+				{statusDOM}
 				{videoListDOM}
 			</div>
 		</div>)

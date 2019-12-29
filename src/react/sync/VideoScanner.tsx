@@ -10,9 +10,9 @@ const fsReadDir = util.promisify(fs.readdir);
 const fsStat = util.promisify(fs.stat);
 const dataPersister = new IPCInvoker("dataPersister");
 
-const VIDEO_EXTENSIONS = new Set([".mp4", ".wmv", ".mkv", ".avi", ".rmvb", ".rm", ".flv", ".mov", ".3gp", ".VOB", ".MKV"]);
+export const VIDEO_EXTENSIONS = new Set([".mp4", ".wmv", ".mkv", ".avi", ".rmvb", ".rm", ".flv", ".mov", ".3gp", ".VOB", ".MKV"]);
 
-type ScanDirectory = string;
+export type ScanDirectory = string;
 
 export default class VideoScanner {
 
@@ -107,7 +107,7 @@ ${msToTime(new Date().getTime() - this._startTime.getTime())} ${statuses.join(' 
 	}
 }
 
-function msToTime(duration: number): string {
+export function msToTime(duration: number): string {
 	let milliseconds = Math.floor((duration % 1000) / 100),
 		seconds = Math.floor((duration / 1000) % 60),
 		minutes = Math.floor((duration / (1000 * 60)) % 60),
