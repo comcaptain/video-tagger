@@ -7,6 +7,7 @@ import IPCInvoker from '../ipc/IPCInvoker';
 import { TagWithVideoIDs, TagType } from '../../share/bean/Tag';
 import { VideoWithScreenshots } from '../../share/bean/Video';
 import VideoList from '../video/VideoList';
+import VideoMover from './VideoMover';
 
 const CATEGORIES = [{type: TagType.FIRST_LEVEL}, {type: TagType.SECOND_LEVEL}, {type: TagType.FILE_NAME}, {type: TagType.OTHER, isDefault: true}]
 
@@ -81,6 +82,11 @@ export default class TagCategories extends React.Component<Props, State> {
 		return filteredVideos;
 	}
 
+	moveVideos() {
+		// Move path to conf
+		new VideoMover('v:/tagged_mirror', this.state.tags, this.state.videos).move();
+	}
+
 	render() {
 		const categories = CATEGORIES.map(category => (<TagCategory 
 			tags={this.state.tags}
@@ -103,6 +109,10 @@ export default class TagCategories extends React.Component<Props, State> {
 						disabled={this.state.savingTagTypes} 
 						className="action-button green" 
 						onClick={this.saveTagTypes.bind(this)}>保存标签分类</button>
+					<button 
+						disabled={videoIDs.length > 0} 
+						className="action-button green" 
+						onClick={this.moveVideos.bind(this)}>按照标签移动视频</button>
 				</div>
 				{videoListDOM}
 			</div>
