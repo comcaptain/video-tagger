@@ -2,7 +2,7 @@ import * as Video from '../../share/bean/Video'
 import React from "react";
 import Navigation from "../navigation/Navigation";
 import IndexedVideos from "./IndexedVideos"
-import './Sync.css'
+import './Sync.scss'
 import '../styles/buttons.scss'
 import fs from "fs";
 import util from "util";
@@ -10,6 +10,7 @@ import {remote} from 'electron';
 import VideoScanner from './VideoScanner';
 import IPCInvoker from '../ipc/IPCInvoker';
 import VideoPlayer from '../video/VideoPlayer';
+import FileCleaner from './FileCleaner';
 const fsDelete = util.promisify(fs.unlink);
 const dialog = remote.dialog;
 
@@ -38,6 +39,7 @@ export default class Sync extends React.Component<Props, State> {
 		};
 		this.selectDirectories = this.selectDirectories.bind(this);
 		this.doSync = this.doSync.bind(this);
+		this.doCleanup = this.doCleanup.bind(this);
 	}
 	
 	selectDirectories() {
@@ -67,6 +69,15 @@ export default class Sync extends React.Component<Props, State> {
 		});
 	}
 
+	async doCleanup() {
+		this.setState({scanning: true, status: "Clean up started..."});
+		let cleaner = new FileCleaner(this.state.directories);
+		let timer = setInterval(() => this.setState({status: cleaner.status}), 100);
+		await cleaner.cleanup();
+		this.setState({status: cleaner.status, scanning: false});
+		clearInterval(timer);
+	}
+
 	handleVideoClick(event: React.MouseEvent, videoPath: Video.VideoPath) {
 		if (event.ctrlKey) {			
 			if (!window.confirm(`Are you sure to delete video ${videoPath}?`)) return;
@@ -93,9 +104,10 @@ export default class Sync extends React.Component<Props, State> {
 		return (<div>
 			<Navigation name="sync" />
 			<div id="sync">
-				{<button className="action-button green" disabled={this.state.scanning} onClick={this.selectDirectories}>选择文件夹</button>}
+				{<button className="action-button green choose-file" disabled={this.state.scanning} onClick={this.selectDirectories}>选择文件夹</button>}
 				{diretoryDOMs.length > 0 && <ul id="directories">{diretoryDOMs}</ul>}
 				{this.dirSelected() && <button className="action-button green" disabled={this.state.scanning} onClick={this.doSync}>同步</button>}
+				{this.dirSelected() && <button className="action-button green" disabled={this.state.scanning} onClick={this.doCleanup}>清理</button>}
 				{this.state.status && <pre className="status">{this.state.status}</pre>}
 				{notIndexedVideoDOMs.length > 0 && <ul id="not-indexed-videos">{notIndexedVideoDOMs}</ul>}
 			</div>
