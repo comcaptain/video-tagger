@@ -14,6 +14,7 @@
     #video-list {
         overflow-y: auto;
         padding-right: 50px;
+        will-change: transform;
     }
     
     #videos-meta {	
