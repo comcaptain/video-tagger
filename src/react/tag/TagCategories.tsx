@@ -35,13 +35,14 @@ export default class TagCategories extends React.Component<Props, State> {
 		this.handleTypeChange = this.handleTypeChange.bind(this);
 		this.handleDragTagStart = this.handleDragTagStart.bind(this);
 		this.handleDragTagEnd = this.handleDragTagEnd.bind(this);
-		this.reloadTags();
-		new IPCInvoker("dataLoader").invoke("loadAllVideos").then((v: VideoWithScreenshots[]) => this.setState({videos: v.reverse()}));
+		this.reload();
 	}
 
-	async reloadTags() {
+	async reload() {
 		const tags = await new IPCInvoker("dataLoader").invoke("loadAllTags");
-		return this.setState({ tags: tags.sort((a: TagWithVideoIDs, b: TagWithVideoIDs) => b.videoIDs.length - a.videoIDs.length) });	
+		this.setState({ tags: tags.sort((a: TagWithVideoIDs, b: TagWithVideoIDs) => b.videoIDs.length - a.videoIDs.length) });	
+		const allVideos = await new IPCInvoker("dataLoader").invoke("loadAllVideos");
+		this.setState({videos: allVideos.reverse()});
 	}
 
 	handleTypeChange(tag: TagWithVideoIDs, newType: TagType) {
@@ -63,7 +64,7 @@ export default class TagCategories extends React.Component<Props, State> {
 		if (!window.confirm("确定要保存标签分类吗？")) return;
 		this.setState({savingTagTypes: true});
 		new IPCInvoker("dataPersister").invoke("updateTagTypes", this.state.tags)
-			.then(() => this.reloadTags())
+			.then(() => this.reload())
 			.then(() => this.setState({savingTagTypes: false}));
 	}
 
@@ -94,6 +95,7 @@ export default class TagCategories extends React.Component<Props, State> {
 		await videoMover.move();
 		clearInterval(timer);
 		refreshLog();
+		this.reload();
 	}
 
 	render() {
