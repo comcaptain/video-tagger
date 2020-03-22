@@ -8,7 +8,9 @@ import fs from 'fs';
 const dataPersister = new IPCInvoker("dataPersister");
 const fsRename = util.promisify(fs.rename);
 const fsMkdir = util.promisify(fs.mkdir);
+const fsExists = util.promisify(fs.exists);
 const TAG_NAME_MARKER = "_$_";
+const SUBTITLE_EXTENTIONS = [".srt", ".ass"]
 
 export default class VideoMover {
 
@@ -30,7 +32,6 @@ export default class VideoMover {
         }));
     }
 
-    // TODO: If ass/srt exists with the same name, then move it to new path
     private async _moveVideo(videoID: VideoID, oldPath: VideoPath, newPath: VideoPath) {
         if (oldPath === newPath) return;
         let targetDirectory = path.dirname(newPath);
@@ -39,6 +40,15 @@ export default class VideoMover {
         this.logLines.push(`Created directories, moving video from ${oldPath} to ${newPath} ...`);
         await fsRename(oldPath, newPath);
         this.logLines.push(`Moved video from ${oldPath} to ${newPath}, updating db ...`);
+        const extension = path.extname(oldPath);
+        for (const subtitleExt of SUBTITLE_EXTENTIONS) {
+            let subtitlePath = oldPath.replace(extension, subtitleExt);
+            let subtitleExists = await fsExists(subtitlePath);
+            if (!subtitleExists) continue;
+            let newSubtitlePath = newPath.replace(extension, subtitleExt);
+            this.logLines.push(`Found subtitle ${subtitlePath}, moving it to ${newSubtitlePath}`);
+            await fsRename(subtitlePath, newSubtitlePath);
+        }
         await dataPersister.invoke("updateVideoPath", videoID, newPath);
         this.logLines.push(`Updated path of video ${videoID} from ${oldPath} to ${newPath}`);
     }
