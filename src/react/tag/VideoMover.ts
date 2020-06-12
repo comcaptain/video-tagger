@@ -10,7 +10,7 @@ const fsRename = util.promisify(fs.rename);
 const fsMkdir = util.promisify(fs.mkdir);
 const fsExists = util.promisify(fs.exists);
 const TAG_NAME_MARKER = "_$_";
-const SUBTITLE_EXTENTIONS = [".srt", ".ass"]
+const SUBTITLE_EXTENTIONS = [".srt", ".ass", ".ssa"]
 
 export default class VideoMover {
 
