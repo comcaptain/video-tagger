@@ -28,7 +28,6 @@ export default class VideoList extends React.Component<Props, State> {
 
 	render() {
 		let videos = this.props.videos;
-		if (videos.length > 100) videos = videos.slice(0, 100);
         let thumbnailStyle = {width: `calc(${100 / this.state.screenshotsPerLine}% - 1px)`}
 		let videoDOMs = videos.map(video => <Video {...video} collapsedByDefault={this.props.collapsedByDefault} key={video.path} thumbnailStyle={thumbnailStyle} />);
 		return (<div>
