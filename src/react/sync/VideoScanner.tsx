@@ -10,7 +10,7 @@ const fsReadDir = util.promisify(fs.readdir);
 const fsStat = util.promisify(fs.stat);
 const dataPersister = new IPCInvoker("dataPersister");
 
-export const VIDEO_EXTENSIONS = new Set([".mp4", ".wmv", ".mkv", ".avi", ".rmvb", ".rm", ".flv", ".mov", ".3gp", ".VOB", ".MKV"]);
+export const VIDEO_EXTENSIONS = new Set([".mp4", ".wmv", ".mkv", ".avi", ".rmvb", ".rm", ".flv", ".mov", ".3gp", ".VOB", ".MKV", ".ts"]);
 
 export type ScanDirectory = string;
 
