@@ -50,14 +50,14 @@ export default class VideoList extends React.Component<Props, State> {
 	}
 
 	render() {
-		let videos = shuffle(this.props.videos).slice(0, 20);
+		let displayVideos = shuffle(this.props.videos).slice(0, 20);
 		let thumbnailStyle = { width: `calc(${100 / this.state.screenshotsPerLine}% - 1px)` }
-		let videoDOMs = videos.map(video => <Video {...video} collapsedByDefault={this.props.collapsedByDefault} key={video.path} thumbnailStyle={thumbnailStyle} />);
+		let videoDOMs = displayVideos.map(video => <Video {...video} collapsedByDefault={this.props.collapsedByDefault} key={video.path} thumbnailStyle={thumbnailStyle} />);
 		return (<div>
 			<Navigation name="list" />
 			<div id="videos-container">
 				<div id="videos-meta">
-					<span id="video-count">{videos.length}个视频</span>
+					<span id="video-count">{displayVideos.length}/{this.props.videos.length}个视频</span>
 					<input type="number"
 						id="screenshots-per-line"
 						onChange={this.updateScreenshotsPerLine}
